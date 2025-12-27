@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { USER_DATA, ICONS } from './constants';
 import { Skill } from './types';
-import ChatWidget from './components/ChatWidget';
-import { jsPDF } from 'jspdf';
+
+// Lazy load ChatWidget to speed up initial paint
+const ChatWidget = lazy(() => import('./components/ChatWidget'));
 
 const CompassLogo = ({ className = "", color = "#7c6837" }: { className?: string, color?: string }) => (
   <div className={`relative ${className} group select-none`}>
@@ -127,8 +128,11 @@ const App: React.FC = () => {
     return <ICONS.Bot />;
   };
 
-  const handleDownloadResume = () => {
+  // Performance Optimization: Dynamic Import for jsPDF
+  const handleDownloadResume = async () => {
     try {
+      // Show some loading state if needed, but for speed we just import
+      const { jsPDF } = await import('jspdf');
       const doc = new jsPDF();
       const margin = 20;
       let y = 20;
@@ -773,7 +777,10 @@ const App: React.FC = () => {
         </div>
       </footer>
 
-      <ChatWidget />
+      {/* Lazy loaded ChatWidget */}
+      <Suspense fallback={null}>
+        <ChatWidget />
+      </Suspense>
       
       <style dangerouslySetInnerHTML={{ __html: `
         .animate-float { animation: float 6s ease-in-out infinite; }
