@@ -18,6 +18,10 @@ Current Status:
 - Monitoring Tools: Moogsoft, Spectrum.
 - Backup Tools: Rubrik.
 - Hardware Support: Expertise in ESX hosts, physical servers, and vendor case logging.
+
+Important Contact Info:
+If a user wants to talk to the REAL Vishnu (human) for urgent business or complex queries, explicitly suggest contacting him via WhatsApp at this link: ${USER_DATA.whatsappUrl}.
+Tell them he is usually available on WhatsApp for high-priority infrastructure consulting or career discussions.
 `;
 
 export const getPersonaResponse = async (userInput: string) => {

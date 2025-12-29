@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PersonalData, Experience, Skill } from './types';
 
@@ -11,6 +12,8 @@ export interface ExtendedPersonalData extends PersonalData {
   }[];
   certifications: string[];
   extraCurricular: string[];
+  whatsappUrl: string;
+  phoneNumber: string;
 }
 
 export const USER_DATA: ExtendedPersonalData = {
@@ -20,6 +23,8 @@ export const USER_DATA: ExtendedPersonalData = {
   bio: "I am a seasoned System Administrator with over 8 years of professional experience. My journey began with 6 years at TVS Mobility (2016-2022) and currently continues at HCL (since Sep 2022), where I manage a massive environment of approximately 16,000 servers. I specialize in high-stakes incident management (P1-P3), virtualization at scale, and robust backup solutions.",
   email: "vishnunath.m95@gmail.com",
   linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+  phoneNumber: "+91 99440 12688",
+  whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20I%20saw%20your%20portfolio%20and%20wanted%20to%20connect!",
   skills: [
     { 
       name: "Windows Server (2003-2022)", 
@@ -124,6 +129,9 @@ export const ICONS = {
   ),
   Linkedin: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+  ),
+  WhatsApp: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3l-1.5 4.5Z"/><path d="M9.4 8.9c.4.2.8.5 1.1.9l.4.5c.3.4.4.8.2 1.2-.2.3-.6.6-1 1l-.2.2c-.3.3-.6.7-.4 1.2.2.4.6.9 1.1 1.4.5.5 1 .9 1.4 1.1.5.2.9-.1 1.2-.4l.2-.2c.4-.4.7-.8 1-.6.4.2.8.3 1.2.2.4-.2.7-.4.9-.8.2-.4.1-.9-.2-1.2l-.5-.4c-.4-.3-.7-.6-.9-1.1"/></svg>
   ),
   Mail: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>

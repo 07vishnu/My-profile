@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ICONS } from '../constants';
+import { ICONS, USER_DATA } from '../constants';
 import { Message } from '../types';
 import { getPersonaResponse } from '../services/geminiService';
 
@@ -131,6 +131,21 @@ const ChatWidget: React.FC = () => {
                 <div className="bg-white p-5 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm w-[200px]">
                   <ThinkingIndicator />
                 </div>
+              </div>
+            )}
+            
+            {/* Direct WhatsApp Prompt */}
+            {!isLoading && messages.length > 2 && (
+              <div className="flex justify-center pt-2">
+                 <a 
+                  href={USER_DATA.whatsappUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-green-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg hover:bg-green-600 transition-all active:scale-95"
+                >
+                  <ICONS.WhatsApp />
+                  Talk to Real Vishnu on WhatsApp
+                </a>
               </div>
             )}
           </div>
