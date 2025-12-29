@@ -24,7 +24,7 @@ export const USER_DATA: ExtendedPersonalData = {
   email: "vishnunath.m95@gmail.com",
   linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
   phoneNumber: "+91 99440 12688",
-  whatsappUrl: "https://wa.me/919944012688?text=Hi%20Vishnu,%20I%20have%20a%20question%20from%20your%20AI%20Agent.",
+  whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20your%20AI%20agent%20suggested%20I%20contact%20you%20for%20further%20details.",
   skills: [
     { 
       name: "Windows Server (2003-2022)", 

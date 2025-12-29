@@ -37,7 +37,7 @@ const ChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
-      text: "System Online. I am Vishnunath's AI Agent. Ask me about his 16,000-server infrastructure or technical certifications. If I am unsure, I will bridge you to him directly.",
+      text: "System Online. I am Vishnunath's AI Agent. Ask me about his 16,000-server infrastructure or technical background. If I'm unsure, he will come and reply to you personally.",
       timestamp: new Date()
     }
   ]);
@@ -78,8 +78,8 @@ const ChatWidget: React.FC = () => {
     setMessages(prev => [...prev, botMessage]);
     setIsLoading(false);
 
-    // Check if the response contains the handoff keyword
-    if (responseText.toLowerCase().includes("reply to you personally")) {
+    // If the response contains the specific handoff trigger phrase
+    if (responseText.toLowerCase().includes("he will come and reply")) {
       setShowHandoff(true);
     }
   };
@@ -95,10 +95,10 @@ const ChatWidget: React.FC = () => {
                 <ICONS.Bot />
               </div>
               <div>
-                <p className="font-black text-xs uppercase tracking-widest">Infra Agent v2.5</p>
+                <p className="font-black text-xs uppercase tracking-widest text-[#7c6837]">Infra Agent</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>
-                  <p className="text-[9px] font-bold opacity-60 uppercase tracking-tighter">Live Relay Active</p>
+                  <p className="text-[9px] font-bold opacity-60 uppercase tracking-tighter text-white">Live Bridge</p>
                 </div>
               </div>
             </div>
@@ -124,18 +124,18 @@ const ChatWidget: React.FC = () => {
               </div>
             )}
             {showHandoff && (
-              <div className="animate-in fade-in zoom-in duration-500">
+              <div className="animate-in fade-in zoom-in duration-500 pt-2">
                 <a 
                   href={USER_DATA.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-5 bg-green-500 text-white rounded-[2rem] text-center shadow-xl hover:bg-green-600 transition-all group scale-95"
+                  className="block p-5 bg-green-500 text-white rounded-[2rem] text-center shadow-xl hover:bg-green-600 transition-all group active:scale-95"
                 >
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <ICONS.WhatsApp />
-                    <span className="font-black text-xs uppercase tracking-widest">Connect to Vishnu</span>
+                    <span className="font-black text-xs uppercase tracking-widest">Bridging to WhatsApp...</span>
                   </div>
-                  <p className="text-[10px] font-medium opacity-90">Click here to notify him on WhatsApp now</p>
+                  <p className="text-[10px] font-medium opacity-90">Open chat to receive your personal reply</p>
                 </a>
               </div>
             )}
@@ -149,7 +149,7 @@ const ChatWidget: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Ask the Agent a question..."
+                placeholder="Query the Agent..."
                 className="w-full bg-[#fbf9f4] text-slate-900 pl-5 pr-14 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-[#7c6837]/20 focus:border-[#7c6837] transition-all text-sm font-medium"
               />
               <button 
