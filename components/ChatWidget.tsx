@@ -12,7 +12,7 @@ const ThinkingIndicator = () => (
         <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
       </div>
       <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 animate-pulse">
-        Querying 16k Node Grid...
+        Agent Scanning Nodes...
       </span>
     </div>
     <div className="grid grid-cols-4 gap-1.5 h-1">
@@ -45,7 +45,7 @@ const ChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
-      text: "Hi! I'm Vishnu's AI twin. Want to know about his system admin experience, technical certifications, or how he manages enterprise infrastructure?",
+      text: "Hello. I am the AI Agent for Vishnunath's Infrastructure Portfolio. I can provide technical stats on his 16k server environment. If I cannot assist, I will bridge you to him via WhatsApp.",
       timestamp: new Date()
     }
   ]);
@@ -88,18 +88,18 @@ const ChatWidget: React.FC = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Chat Window */}
       {isOpen && (
-        <div className="mb-4 w-[350px] sm:w-[400px] h-[500px] flex flex-col glass rounded-[2rem] shadow-2xl overflow-hidden border border-white/50 animate-in slide-in-from-bottom-5">
+        <div className="mb-4 w-[350px] sm:w-[400px] h-[550px] flex flex-col glass rounded-[2.5rem] shadow-3xl overflow-hidden border border-white/60 animate-in slide-in-from-bottom-5">
           {/* Header */}
-          <div className="p-5 bg-indigo-600 text-white flex justify-between items-center shadow-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+          <div className="p-6 bg-[#433929] text-white flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#7c6837]">
                 <ICONS.Bot />
               </div>
               <div>
-                <p className="font-bold text-sm">Vishnu's AI Twin</p>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                  <p className="text-[10px] font-medium opacity-80 uppercase tracking-wider">Infra Node: Active</p>
+                <p className="font-black text-xs uppercase tracking-widest">AI Agent v2.0</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>
+                  <p className="text-[9px] font-bold opacity-60 uppercase tracking-tighter">Bridge Ready</p>
                 </div>
               </div>
             </div>
@@ -107,18 +107,34 @@ const ChatWidget: React.FC = () => {
               onClick={() => setIsOpen(false)}
               className="hover:bg-white/10 p-2 rounded-xl transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
 
+          {/* Quick Contact Banner */}
+          <a 
+            href={USER_DATA.whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500/10 border-b border-green-500/20 px-6 py-3 flex items-center justify-between group hover:bg-green-500/20 transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-green-600"><ICONS.WhatsApp /></div>
+              <span className="text-[10px] font-black text-green-700 uppercase tracking-widest">Direct Human Handoff</span>
+            </div>
+            <div className="group-hover:translate-x-1 transition-transform text-green-600">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+          </a>
+
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-6 bg-slate-50/50">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div 
-                  className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                  className={`max-w-[85%] p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${
                     m.role === 'user' 
-                      ? 'bg-indigo-600 text-white rounded-tr-none' 
+                      ? 'bg-[#433929] text-white rounded-tr-none' 
                       : 'bg-white text-slate-800 rounded-tl-none border border-slate-100'
                   }`}
                 >
@@ -128,47 +144,35 @@ const ChatWidget: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white p-5 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm w-[200px]">
+                <div className="bg-white p-5 rounded-3xl rounded-tl-none border border-slate-100 shadow-sm w-[200px]">
                   <ThinkingIndicator />
                 </div>
               </div>
             )}
-            
-            {/* Direct WhatsApp Prompt */}
-            {!isLoading && messages.length > 2 && (
-              <div className="flex justify-center pt-2">
-                 <a 
-                  href={USER_DATA.whatsappUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-green-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg hover:bg-green-600 transition-all active:scale-95"
-                >
-                  <ICONS.WhatsApp />
-                  Talk to Real Vishnu on WhatsApp
-                </a>
-              </div>
-            )}
           </div>
 
-          {/* Input */}
-          <div className="p-5 bg-white border-t border-slate-100">
-            <div className="relative group">
+          {/* Input Area */}
+          <div className="p-6 bg-white border-t border-slate-100">
+            <div className="relative">
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Ask Vishnu's twin a question..."
-                className="w-full bg-slate-50 text-slate-900 pl-4 pr-12 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                placeholder="Query the Agent..."
+                className="w-full bg-[#fbf9f4] text-slate-900 pl-5 pr-14 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-[#7c6837]/20 focus:border-[#7c6837] transition-all text-sm font-medium"
               />
               <button 
                 onClick={handleSend}
                 disabled={isLoading}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all disabled:opacity-50"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#433929] text-white rounded-xl flex items-center justify-center hover:bg-[#7c6837] transition-all disabled:opacity-50 shadow-lg"
               >
                 <ICONS.Send />
               </button>
             </div>
+            <p className="mt-3 text-[9px] text-center text-slate-400 font-bold uppercase tracking-widest">
+              Secured by Gemini Enterprise AI
+            </p>
           </div>
         </div>
       )}
@@ -176,28 +180,22 @@ const ChatWidget: React.FC = () => {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 rounded-2xl bg-indigo-600 text-white shadow-2xl shadow-indigo-200 flex items-center justify-center hover:scale-105 active:scale-95 transition-all group relative overflow-hidden"
+        className="w-16 h-16 rounded-[1.5rem] bg-[#433929] text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group relative"
       >
-        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-700 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        <div className="relative z-10 scale-110">
+        <div className="absolute inset-0 bg-[#7c6837] rounded-[1.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div className="relative z-10">
           {isOpen ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           ) : (
              <ICONS.Bot />
           )}
         </div>
         
         {!isOpen && (
-           <span className="absolute -top-1 -right-1 flex h-4 w-4">
-             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-             <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500 border-2 border-white"></span>
+           <span className="absolute -top-1 -right-1 flex h-5 w-5">
+             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#7c6837] opacity-75"></span>
+             <span className="relative inline-flex rounded-full h-5 w-5 bg-[#7c6837] border-4 border-[#fbf9f4]"></span>
            </span>
-        )}
-        
-        {!isOpen && (
-           <div className="absolute right-20 bg-slate-900 text-white py-2.5 px-5 rounded-2xl shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 pointer-events-none font-bold text-xs uppercase tracking-widest border border-slate-800">
-             Infrastructure Brain Online
-           </div>
         )}
       </button>
     </div>
