@@ -394,7 +394,7 @@ const App: React.FC = () => {
           <CompassLogo className="w-12 h-12 grayscale opacity-40" />
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">© {new Date().getFullYear()} M. Vishnunath • Infrastructure Specialist</p>
           <div className="flex gap-4">
-             <a href={USER_DATA.linkedinUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-white border border-slate-100 rounded-xl hover:bg-[#433929] hover:text-white transition-all"><ICONS.Linkedin /></a>
+             <a href={USER_DATA.linkedinUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-white border border-slate-100 rounded-xl hover:bg-[#433929] hover:text-white transition-all hover-scale-pulse"><ICONS.Linkedin /></a>
              <a href={USER_DATA.whatsappUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-white border border-slate-100 rounded-xl hover:bg-green-500 hover:text-white transition-all"><ICONS.WhatsApp /></a>
           </div>
         </div>
@@ -414,6 +414,8 @@ const App: React.FC = () => {
         .animate-spin-slow { animation: spin-slow 15s linear infinite; }
         @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .animate-radar-sweep { animation: radar-sweep 4s linear infinite; }
+        @keyframes scale-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .hover-scale-pulse:hover { animation: scale-pulse 2s ease-in-out infinite; }
       `}} />
     </div>
   );

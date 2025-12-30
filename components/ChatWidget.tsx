@@ -12,7 +12,7 @@ const ThinkingIndicator = () => (
         <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
       </div>
       <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 animate-pulse">
-        Agent Querying Nodes...
+        Agent Processing...
       </span>
     </div>
     <div className="grid grid-cols-4 gap-1.5 h-1">
@@ -25,10 +25,6 @@ const ThinkingIndicator = () => (
         </div>
       ))}
     </div>
-    <style dangerouslySetInnerHTML={{ __html: `
-      @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(50%); } }
-      .animate-shimmer { animation: shimmer 1.5s infinite linear; }
-    `}} />
   </div>
 );
 
@@ -37,13 +33,13 @@ const ChatWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
-      text: "System Online. I am Vishnunath's AI Agent. Ask me about his 16,000-server infrastructure or technical background. If I'm unsure, he will come and reply to you personally.",
+      text: "System Online. I am the Website AI Agent. I handle initial technical queries. For live interaction, I can bridge you to Vishnunath on WhatsApp.",
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showHandoff, setShowHandoff] = useState(false);
+  const [handoffContext, setHandoffContext] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,7 +61,7 @@ const ChatWidget: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
-    setShowHandoff(false);
+    setHandoffContext(null);
 
     const responseText = await getPersonaResponse(userMsgText);
     
@@ -78,10 +74,18 @@ const ChatWidget: React.FC = () => {
     setMessages(prev => [...prev, botMessage]);
     setIsLoading(false);
 
-    // If the response contains the specific handoff trigger phrase
-    if (responseText.toLowerCase().includes("he will come and reply")) {
-      setShowHandoff(true);
+    // If the response contains the handoff trigger
+    if (responseText.toLowerCase().includes("reply to you personally")) {
+      setHandoffContext(userMsgText);
     }
+  };
+
+  const getDynamicWhatsAppUrl = () => {
+    const baseUrl = `https://wa.me/${USER_DATA.phoneNumber.replace(/[^0-9]/g, '')}`;
+    const text = handoffContext 
+      ? `Hello Vishnunath, your website AI agent bridged me here. I was asking about: "${handoffContext}"`
+      : `Hello Vishnunath, I'm contacting you from your portfolio website.`;
+    return `${baseUrl}?text=${encodeURIComponent(text)}`;
   };
 
   return (
@@ -89,22 +93,32 @@ const ChatWidget: React.FC = () => {
       {isOpen && (
         <div className="mb-4 w-[350px] sm:w-[400px] h-[600px] flex flex-col glass rounded-[2.5rem] shadow-4xl overflow-hidden border border-white/60 animate-in slide-in-from-bottom-5">
           {/* Header */}
-          <div className="p-6 bg-[#433929] text-white flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#7c6837]">
-                <ICONS.Bot />
-              </div>
-              <div>
-                <p className="font-black text-xs uppercase tracking-widest text-[#7c6837]">Infra Agent</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>
-                  <p className="text-[9px] font-bold opacity-60 uppercase tracking-tighter text-white">Live Bridge</p>
+          <div className="p-6 bg-[#433929] text-white">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#7c6837]">
+                  <ICONS.Bot />
+                </div>
+                <div>
+                  <p className="font-black text-xs uppercase tracking-widest text-[#7c6837]">Web Intelligence</p>
+                  <p className="text-[10px] font-bold opacity-60 uppercase tracking-tighter">Vishnu's AI Assistant</p>
                 </div>
               </div>
+              <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-2 rounded-xl transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
             </div>
-            <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-2 rounded-xl transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
+            {/* Status Bar */}
+            <div className="flex gap-2">
+              <div className="flex-1 bg-white/5 rounded-full py-1.5 px-3 flex items-center justify-center gap-2 border border-white/10">
+                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                <span className="text-[8px] font-black uppercase tracking-widest opacity-80">Agent: Online</span>
+              </div>
+              <div className="flex-1 bg-white/5 rounded-full py-1.5 px-3 flex items-center justify-center gap-2 border border-white/10">
+                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span>
+                <span className="text-[8px] font-black uppercase tracking-widest opacity-80">Human: Bridge</span>
+              </div>
+            </div>
           </div>
 
           {/* Messages */}
@@ -123,19 +137,19 @@ const ChatWidget: React.FC = () => {
                 </div>
               </div>
             )}
-            {showHandoff && (
+            {handoffContext && (
               <div className="animate-in fade-in zoom-in duration-500 pt-2">
                 <a 
-                  href={USER_DATA.whatsappUrl}
+                  href={getDynamicWhatsAppUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-5 bg-green-500 text-white rounded-[2rem] text-center shadow-xl hover:bg-green-600 transition-all group active:scale-95"
+                  className="block p-5 bg-green-500 text-white rounded-[2rem] text-center shadow-xl hover:bg-green-600 transition-all group active:scale-95 animate-bounce-subtle"
                 >
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <ICONS.WhatsApp />
-                    <span className="font-black text-xs uppercase tracking-widest">Bridging to WhatsApp...</span>
+                    <span className="font-black text-xs uppercase tracking-widest">Bridging to WhatsApp</span>
                   </div>
-                  <p className="text-[10px] font-medium opacity-90">Open chat to receive your personal reply</p>
+                  <p className="text-[10px] font-medium opacity-90 italic">"He will come and reply to you personally"</p>
                 </a>
               </div>
             )}
@@ -149,7 +163,7 @@ const ChatWidget: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Query the Agent..."
+                placeholder="Ask the Agent a question..."
                 className="w-full bg-[#fbf9f4] text-slate-900 pl-5 pr-14 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-[#7c6837]/20 focus:border-[#7c6837] transition-all text-sm font-medium"
               />
               <button 
@@ -184,6 +198,16 @@ const ChatWidget: React.FC = () => {
            </span>
         )}
       </button>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        .animate-bounce-subtle { animation: bounce-subtle 2s infinite ease-in-out; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(50%); } }
+        .animate-shimmer { animation: shimmer 1.5s infinite linear; }
+      `}} />
     </div>
   );
 };
