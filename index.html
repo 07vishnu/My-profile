@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -5,50 +6,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M. VISHNUNATH | IT Infrastructure Specialist</title>
     
-    <!-- Resource Hints for faster font loading -->
+    <!-- Resource Hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://esm.sh">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
-            background-color: #fbf9f4;
-            color: #433929;
-            cursor: default;
-        }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #fbf9f4;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #7c6837;
-            border-radius: 20px;
-            border: 3px solid #fbf9f4;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #433929;
+        :root {
+            --google-blue: #1a73e8;
+            --google-red: #ea4335;
+            --google-yellow: #fbbc04;
+            --google-green: #34a853;
+            --google-gray: #5f6368;
+            --google-bg: #ffffff;
+            --google-surface: #f8f9fa;
+            --google-border: #dadce0;
         }
 
-        .glass {
-            background: rgba(251, 249, 244, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(124, 104, 55, 0.05);
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--google-bg);
+            color: #202124;
+            letter-spacing: -0.01em;
+            -webkit-font-smoothing: antialiased;
         }
-        
+
+        /* Material Design 3 Pill Buttons */
+        .btn-google {
+            border-radius: 100px;
+            font-weight: 500;
+            letter-spacing: 0.25px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-google-primary {
+            background-color: var(--google-blue);
+            color: white;
+        }
+
+        .btn-google-primary:hover {
+            background-color: #1557b0;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302), 0 1px 3px 1px rgba(60,64,67,0.149);
+        }
+
+        .google-card {
+            background: #ffffff;
+            border: 1px solid var(--google-border);
+            border-radius: 12px;
+            transition: box-shadow 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .google-card:hover {
+            box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+        }
+
+        /* Google Sites Header Styles */
+        .header-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--google-border);
+        }
+
+        /* Smooth reveal transitions */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .reveal.active {
@@ -56,42 +81,19 @@
             transform: translateY(0);
         }
 
-        @keyframes scan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
+        ::-webkit-scrollbar {
+            width: 10px;
         }
-        .scanline {
-            position: absolute;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(to bottom, transparent, #7c6837, transparent);
-            opacity: 0.1;
-            animation: scan 3s linear infinite;
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        .text-glow {
-            text-shadow: 0 0 20px rgba(124, 104, 55, 0.1);
+        ::-webkit-scrollbar-thumb {
+            background: #bdc1c6;
+            border-radius: 10px;
+            border: 3px solid white;
         }
-
-        .card-perspective {
-            perspective: 1000px;
-        }
-
-        @keyframes pulse-slow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-        .animate-pulse-slow { animation: pulse-slow 3s infinite; }
-        
-        .shadow-3xl {
-            box-shadow: 0 40px 80px -15px rgba(67, 57, 41, 0.12);
-        }
-
-        /* Fun Tech Grid Background */
-        .tech-grid {
-            background-image: radial-gradient(#7c6837 0.5px, transparent 0.5px);
-            background-size: 30px 30px;
-            opacity: 0.05;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9aa0a6;
         }
     </style>
 <script type="importmap">
@@ -106,7 +108,7 @@
 }
 </script>
 </head>
-<body class="overflow-x-hidden">
+<body>
     <div id="root"></div>
 </body>
 </html>

@@ -1,29 +1,11 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { USER_DATA } from "../constants";
 
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const SYSTEM_INSTRUCTION = `
-You are the "Web-Interface Intelligence Unit" for ${USER_DATA.name}. 
-
-PRIMARY OBJECTIVE: 
-Answer technical queries regarding Vishnunath's professional background, skills, and infrastructure experience. 
-
-CORE KNOWLEDGE BASE (TECHNICAL STACK):
-1. VIRTUALIZATION: Expert in VMware (vCenter, ESXi), Hyper-V, and high-density cluster management for 16,000+ servers.
-2. SERVER INFRA: Specialist in Windows Server (2003-2022) lifecycle, Active Directory, and Hardware (Dell/HP/Lenovo).
-3. IT OPERATIONS: ServiceNow (P1-P3 incidents), Moogsoft AIOps, Spectrum Monitoring, and Rubrik Cloud Data Management.
-4. CAREER PATH: 6 years at TVS Mobility, currently at HCLTech since Sep 2022.
-
-HANDOFF PROTOCOL (WHEN KNOWLEDGE IS EXHAUSTED):
-If the user asks a question about private data, non-technical personal opinions, or highly specific architectural advice that requires Vishnunath's personal judgment, you MUST follow these steps:
-1. State clearly that you have reached the boundary of your technical context.
-2. Output the exact handoff instruction: "${USER_DATA.aiConfig.handoffInstruction}"
-3. Append the mandatory trigger code at the very end of your message: ${USER_DATA.aiConfig.handoffTrigger}
-
-TONE: Professional, technical, efficient, and highly polite.
-`;
+const CACHE_KEY = "TECH_NEWS_CACHE";
+const CACHE_TTL = 3600000; // 1 hour
 
 export interface GeminiResult {
   text: string;
@@ -31,6 +13,30 @@ export interface GeminiResult {
   isThinking?: boolean;
   needsHandoff?: boolean;
 }
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  summary: string;
+  url: string;
+  imageUrl?: string;
+  publishedAt: string;
+}
+
+export interface NewsResponse {
+  articles: NewsArticle[];
+  lastUpdated: number;
+}
+
+interface NewsCache {
+  articles: NewsArticle[];
+  timestamp: number;
+}
+
+const SYSTEM_INSTRUCTION = `
+You are the "Web-Interface Intelligence Unit" for ${USER_DATA.name}. 
+Answer technical queries regarding Vishnunath's professional background and infrastructure experience.
+`;
 
 export const getPersonaResponse = async (userInput: string): Promise<GeminiResult> => {
   const ai = getAI();
@@ -43,7 +49,7 @@ export const getPersonaResponse = async (userInput: string): Promise<GeminiResul
         model: "gemini-3-flash-preview",
         contents: userInput,
         config: {
-          systemInstruction: SYSTEM_INSTRUCTION + "\nUse search to cross-reference latest tech documentation if needed.",
+          systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ googleSearch: {} }],
           temperature: 0.2,
         }
@@ -61,10 +67,8 @@ export const getPersonaResponse = async (userInput: string): Promise<GeminiResul
     }
 
     const text = response.text || "";
-    // Detect handoff by checking for the specific trigger or phrases indicating human handoff
     const needsHandoff = text.includes(USER_DATA.aiConfig.handoffTrigger) || 
-                         text.toLowerCase().includes("reply to you personally") ||
-                         text.includes(USER_DATA.aiConfig.handoffInstruction.substring(0, 20));
+                         text.toLowerCase().includes("reply to you personally");
 
     return {
       text: text.replace(USER_DATA.aiConfig.handoffTrigger, "").trim(),
@@ -72,11 +76,122 @@ export const getPersonaResponse = async (userInput: string): Promise<GeminiResul
       isThinking: !needsSearch,
       needsHandoff: needsHandoff
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    
+    let userFeedback = "My neural pathways are experiencing a temporary disruption.";
+    
+    if (!navigator.onLine) {
+      userFeedback = "System Offline: Please check your network connectivity to resume this technical briefing.";
+    } else if (error?.message?.includes("429") || error?.message?.toLowerCase().includes("quota")) {
+      userFeedback = "Infrastructure High Load: I'm processing too many concurrent requests. Please wait a moment while I scale my resources.";
+    } else if (error?.message?.includes("401") || error?.message?.includes("403")) {
+      userFeedback = "Access Denied: There is an authentication failure with my core logic. This has been logged for maintenance.";
+    } else if (error?.message?.includes("500") || error?.message?.includes("503")) {
+      userFeedback = "Upstream Failure: The primary Gemini intelligence cluster is currently undergoing maintenance.";
+    }
+
     return { 
-      text: `I apologize, my technical processing units are currently experiencing a high load. ${USER_DATA.aiConfig.handoffInstruction}`,
+      text: `${userFeedback} ${USER_DATA.aiConfig.handoffInstruction}`,
       needsHandoff: true 
     };
   }
+};
+
+const safePersistNews = (articles: NewsArticle[], timestamp: number) => {
+  const cacheData: NewsCache = { articles, timestamp };
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+  } catch (e: any) {
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      const textOnlyArticles = articles.map(({ imageUrl, ...rest }) => rest);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ articles: textOnlyArticles, timestamp }));
+      } catch (innerError) {
+        localStorage.removeItem(CACHE_KEY);
+      }
+    }
+  }
+};
+
+/**
+ * Fetches the text content of latest news stories.
+ * This is the fast-path for the UI.
+ */
+export const getLatestNewsText = async (forceRefresh = false): Promise<NewsResponse> => {
+  if (!forceRefresh) {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const cacheData: NewsCache = JSON.parse(cached);
+      if (Date.now() - cacheData.timestamp < CACHE_TTL) {
+        return { articles: cacheData.articles, lastUpdated: cacheData.timestamp };
+      }
+    }
+  }
+
+  const ai = getAI();
+  const fetchTimestamp = Date.now();
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: "List 6 critical global tech infrastructure stories from the last 24h. Output JSON.",
+      config: {
+        tools: [{ googleSearch: {} }],
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING },
+              summary: { type: Type.STRING },
+              url: { type: Type.STRING },
+              publishedAt: { type: Type.STRING }
+            },
+            required: ["title", "summary", "url", "publishedAt"]
+          }
+        }
+      }
+    });
+
+    const articles: NewsArticle[] = JSON.parse(response.text || "[]").map((a: any, i: number) => ({
+      ...a,
+      id: `news-${fetchTimestamp}-${i}`
+    }));
+
+    safePersistNews(articles, fetchTimestamp);
+    return { articles, lastUpdated: fetchTimestamp };
+  } catch (error) {
+    console.error("News text fetch failed:", error);
+    const cached = localStorage.getItem(CACHE_KEY);
+    return cached ? { articles: JSON.parse(cached).articles, lastUpdated: JSON.parse(cached).timestamp } : { articles: [], lastUpdated: 0 };
+  }
+};
+
+/**
+ * Generates an image for a specific article.
+ * This is the background-path for the UI.
+ */
+export const generateArticleImage = async (article: NewsArticle): Promise<string | undefined> => {
+  const ai = getAI();
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [{ text: `Minimalist 3D isometric tech icon, high quality, soft lighting: ${article.title}` }]
+      },
+      config: { imageConfig: { aspectRatio: "1:1" } }
+    });
+
+    const imgPart = response.candidates[0].content.parts.find(p => p.inlineData);
+    return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+// Legacy support for App.tsx if needed
+export const getLatestTechNews = async (forceRefresh = false): Promise<NewsResponse> => {
+  const textResult = await getLatestNewsText(forceRefresh);
+  return textResult;
 };

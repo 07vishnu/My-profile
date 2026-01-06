@@ -53,6 +53,12 @@ export const USER_DATA: ExtendedPersonalData = {
       description: "Specialized in high-density virtualization. Managing vCenter clusters at massive scale, optimizing ESXi host performance, and ensuring seamless workload migration. Deep knowledge of vMotion, High Availability (HA), and Distributed Resource Scheduler (DRS) in environments with 16k+ nodes."
     },
     { 
+      name: "Networking & Connectivity", 
+      category: "Backend", 
+      level: 92,
+      description: "Enterprise networking orchestration. Managing VLAN tagging, static routing, and VPN tunnels. Skilled in troubleshooting connectivity issues across complex distributed environments and implementing OS-level firewall rules for infrastructure isolation."
+    },
+    { 
       name: "Hyper-V Administration", 
       category: "Tools", 
       level: 90,
@@ -179,6 +185,12 @@ export const ICONS = {
   ),
   Hardware: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+  ),
+  Network: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1-1v3"/><path d="M12 12V8"/></svg>
+  ),
+  News: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
   ),
   Download: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
