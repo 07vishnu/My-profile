@@ -2,7 +2,7 @@
 import React from 'react';
 import { PersonalData, Experience, Skill } from './types';
 
-// Extended type to include resume-specific fields
+// Extended type to include resume-specific fields and AI orchestration data
 export interface ExtendedPersonalData extends PersonalData {
   education: {
     degree: string;
@@ -14,6 +14,13 @@ export interface ExtendedPersonalData extends PersonalData {
   extraCurricular: string[];
   whatsappUrl: string;
   phoneNumber: string;
+  aiConfig: {
+    handoffTrigger: string;
+    availabilityStatus: 'online' | 'busy' | 'away';
+    awayMessage: string;
+    waTemplate: string;
+    handoffInstruction: string;
+  };
 }
 
 export const USER_DATA: ExtendedPersonalData = {
@@ -25,6 +32,13 @@ export const USER_DATA: ExtendedPersonalData = {
   linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
   phoneNumber: "+91 99440 12688",
   whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20your%20AI%20agent%20suggested%20I%20contact%20you%20for%20further%20details.",
+  aiConfig: {
+    handoffTrigger: "BRIDGE_TO_HUMAN",
+    availabilityStatus: 'online',
+    awayMessage: "Vishnu is currently resolving a high-priority server incident. I have logged your request; please proceed to WhatsApp to queue your query.",
+    waTemplate: "Hello Vishnunath, I'm reaching out from your portfolio. I have a query that your AI agent suggested you handle personally: ",
+    handoffInstruction: "I apologize, but I have reached the threshold of my current technical knowledge regarding this specific query. I have flagged this for Vishnunath's personal review. He typically responds to professional inquiries personally within a few hours. To ensure he sees your specific question immediately, please use the 'Professional Bridge' button below to continue this conversation directly on his personal WhatsApp."
+  },
   skills: [
     { 
       name: "Windows Server (2003-2022)", 
