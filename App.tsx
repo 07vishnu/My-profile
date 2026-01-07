@@ -16,7 +16,7 @@ const GoogleLoader = () => (
       <div className="w-3 h-3 rounded-full bg-[#FBBC05] animate-bounce" style={{ animationDelay: '0.2s' }}></div>
       <div className="w-3 h-3 rounded-full bg-[#34A853] animate-bounce" style={{ animationDelay: '0.3s' }}></div>
     </div>
-    <p className="text-xs font-medium text-[#5f6368] animate-pulse">Syncing with Tech Intelligence...</p>
+    <p className="text-xs font-medium text-[#5f6368] animate-pulse uppercase tracking-widest">Scanning Global Infrastructure Clusters...</p>
   </div>
 );
 
@@ -109,10 +109,9 @@ const Navbar = memo(({ activeSection, scrollToSection, isNewsMode, setIsNewsMode
 const SkillCard = memo(({ skill, onClick, icon }: any) => (
   <button 
     onClick={onClick} 
-    aria-label={`View details for ${skill.name} proficiency`}
     className="google-card p-6 cursor-pointer flex items-start gap-4 transition-all duration-300 group hover:scale-[1.03] hover:shadow-2xl hover:border-black hover:border-2 text-left w-full"
   >
-    <div className="w-12 h-12 rounded-lg bg-[#f8f9fa] flex items-center justify-center text-[#5f6368] group-hover:text-[#1a73e8] transition-colors" aria-hidden="true">
+    <div className="w-12 h-12 rounded-lg bg-[#f8f9fa] flex items-center justify-center text-[#5f6368] group-hover:text-[#1a73e8] transition-colors">
       {icon}
     </div>
     <div className="flex-1">
@@ -122,11 +121,6 @@ const SkillCard = memo(({ skill, onClick, icon }: any) => (
           <div 
             className="h-full bg-[#1a73e8] transition-all duration-1000" 
             style={{ width: `${skill.level}%` }}
-            role="progressbar"
-            aria-valuenow={skill.level}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`${skill.name} skill level`}
           ></div>
         </div>
         <span className="text-[10px] font-medium text-[#5f6368]">{skill.level}%</span>
@@ -184,13 +178,10 @@ const App: React.FC = () => {
     setNewsError(null);
     try {
       const result = await getLatestNewsText(forceRefresh);
-      if (result.articles.length === 0 && forceRefresh) {
-        throw new Error("No news articles found.");
-      }
       setNews(result.articles);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      setNewsError("Failed to fetch latest tech news. Please try again later.");
+      setNewsError("Tech Radar uplink failed. Check your API configuration in Vercel settings.");
     } finally {
       setIsNewsLoading(false);
     }
@@ -244,8 +235,8 @@ const App: React.FC = () => {
           <div className="container mx-auto px-6 max-w-5xl animate-in fade-in duration-500">
             <div className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
               <div>
-                <h2 className="text-3xl font-semibold text-[#202124] mb-2">Tech Radar</h2>
-                <p className="text-[#5f6368] text-sm">Latest industry updates curated by AI Intelligence cluster.</p>
+                <h2 className="text-3xl font-semibold text-[#202124] mb-2">Infrastructure Radar</h2>
+                <p className="text-[#5f6368] text-sm">Real-time enterprise tech intelligence via Gemini Search Grounding.</p>
               </div>
               <button 
                 onClick={() => loadLatestNews(true)}
@@ -255,14 +246,15 @@ const App: React.FC = () => {
                 <div className={isNewsLoading ? "animate-spin" : "group-hover:rotate-12 transition-transform"}>
                   <ICONS.Bot />
                 </div>
-                {isNewsLoading ? 'Scanning Infrastructure...' : 'Check Today\'s News'}
+                {isNewsLoading ? 'Syncing...' : 'Refresh Radar'}
               </button>
             </div>
             
             {isNewsLoading ? <GoogleLoader /> : newsError ? (
               <div className="bg-[#fce8e6] border border-[#ea4335] rounded-2xl p-10 text-center flex flex-col items-center gap-4">
                 <p className="text-lg font-semibold text-[#d93025]">{newsError}</p>
-                <button onClick={() => loadLatestNews(true)} className="px-8 py-3 btn-google btn-google-primary text-sm shadow-md flex items-center gap-2">Retry Uplink</button>
+                <p className="text-sm text-[#5f6368] max-w-md">Verify your API_KEY is set in Vercel Environment Variables and that the Gemini model is accessible.</p>
+                <button onClick={() => loadLatestNews(true)} className="px-8 py-3 btn-google btn-google-primary text-sm shadow-md flex items-center gap-2">Retry Link</button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -271,8 +263,22 @@ const App: React.FC = () => {
                     <span className="text-[10px] font-bold text-[#1a73e8] uppercase tracking-wider mb-2">{article.publishedAt}</span>
                     <h3 className="text-lg font-semibold text-[#202124] mb-3 leading-snug group-hover:text-[#1a73e8] transition-colors">{article.title}</h3>
                     <p className="text-[#5f6368] text-sm leading-relaxed mb-6 line-clamp-3">{article.summary}</p>
+                    
+                    {article.sources && article.sources.length > 0 && (
+                      <div className="mb-6 pt-4 border-t border-[#f1f3f4]">
+                        <p className="text-[10px] font-bold text-[#9aa0a6] uppercase mb-2 tracking-widest">Grounding Sources:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {article.sources.map((s, idx) => (
+                            <a key={idx} href={s.uri} target="_blank" rel="noopener noreferrer" className="text-[9px] bg-[#f1f3f4] hover:bg-[#e8f0fe] hover:text-[#1a73e8] px-2 py-1 rounded transition-colors truncate max-w-[120px]">
+                              {s.title}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <a href={article.url} target="_blank" rel="noopener noreferrer" className="mt-auto text-sm font-medium text-[#1a73e8] hover:underline flex items-center gap-1">
-                      Explore Coverage <ICONS.ExternalLink />
+                      Full Coverage <ICONS.ExternalLink />
                     </a>
                   </article>
                 ))}

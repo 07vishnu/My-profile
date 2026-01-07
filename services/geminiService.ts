@@ -5,7 +5,6 @@ import { USER_DATA } from "../constants";
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const CACHE_KEY = "TECH_NEWS_CACHE";
-const COMIC_CACHE_KEY = "COMIC_ASSETS_CACHE";
 const CACHE_TTL = 3600000; // 1 hour
 
 export interface GeminiResult {
@@ -20,8 +19,8 @@ export interface NewsArticle {
   title: string;
   summary: string;
   url: string;
-  imageUrl?: string;
   publishedAt: string;
+  sources?: { title: string; uri: string }[];
 }
 
 export interface NewsResponse {
@@ -79,24 +78,19 @@ export const getPersonaResponse = async (userInput: string): Promise<GeminiResul
     };
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    
-    let userFeedback = "My neural pathways are experiencing a temporary disruption.";
-    
-    if (!navigator.onLine) {
-      userFeedback = "System Offline: Please check your network connectivity to resume this technical briefing.";
-    } else if (error?.message?.includes("429") || error?.message?.toLowerCase().includes("quota")) {
-      userFeedback = "Infrastructure High Load: I'm processing too many concurrent requests. Please wait a moment while I scale my resources.";
-    } else if (error?.message?.includes("401") || error?.message?.includes("403")) {
-      userFeedback = "Access Denied: There is an authentication failure with my core logic. This has been logged for maintenance.";
-    } else if (error?.message?.includes("500") || error?.message?.includes("503")) {
-      userFeedback = "Upstream Failure: The primary Gemini intelligence cluster is currently undergoing maintenance.";
-    }
-
     return { 
-      text: `${userFeedback} ${USER_DATA.aiConfig.handoffInstruction}`,
+      text: `System Alert: Latency detected in neural uplink. ${USER_DATA.aiConfig.handoffInstruction}`,
       needsHandoff: true 
     };
   }
+};
+
+/**
+ * Sanitizes AI response text to extract clean JSON.
+ */
+const cleanJSON = (text: string) => {
+  const jsonMatch = text.match(/\[[\s\S]*\]/);
+  return jsonMatch ? jsonMatch[0] : text;
 };
 
 export const getLatestNewsText = async (forceRefresh = false): Promise<NewsResponse> => {
@@ -114,8 +108,8 @@ export const getLatestNewsText = async (forceRefresh = false): Promise<NewsRespo
   const fetchTimestamp = Date.now();
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: "List 6 critical global tech infrastructure stories from the last 24h. Output JSON.",
+      model: "gemini-3-pro-preview",
+      contents: "Search and list exactly 6 major enterprise IT infrastructure or server virtualization news stories from the last 24 hours. Focus on Windows Server, VMware, HCLTech, or Cloud Infrastructure. Return as a clean JSON array of objects.",
       config: {
         tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
@@ -135,32 +129,45 @@ export const getLatestNewsText = async (forceRefresh = false): Promise<NewsRespo
       }
     });
 
-    const articles: NewsArticle[] = JSON.parse(response.text || "[]").map((a: any, i: number) => ({
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const sourceLinks = groundingChunks
+      .filter((c: any) => c.web)
+      .map((c: any) => ({ title: c.web.title, uri: c.web.uri }));
+
+    const rawText = response.text || "[]";
+    const cleanedText = cleanJSON(rawText);
+    const parsedArticles = JSON.parse(cleanedText);
+
+    const articles: NewsArticle[] = parsedArticles.map((a: any, i: number) => ({
       ...a,
-      id: `news-${fetchTimestamp}-${i}`
+      id: `news-${fetchTimestamp}-${i}`,
+      // Attach search grounding sources if available
+      sources: sourceLinks.slice(i * 2, (i * 2) + 2) 
     }));
+
+    if (articles.length === 0) throw new Error("Empty news response");
 
     const cacheData: NewsCache = { articles, timestamp: fetchTimestamp };
     localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
     return { articles, lastUpdated: fetchTimestamp };
   } catch (error) {
-    console.error("News text fetch failed:", error);
+    console.error("Tech Radar Fetch Failure:", error);
     const cached = localStorage.getItem(CACHE_KEY);
-    return cached ? { articles: JSON.parse(cached).articles, lastUpdated: JSON.parse(cached).timestamp } : { articles: [], lastUpdated: 0 };
+    if (cached) {
+      const cacheData = JSON.parse(cached);
+      return { articles: cacheData.articles, lastUpdated: cacheData.timestamp };
+    }
+    throw error;
   }
 };
 
-/**
- * Generates technical background images.
- * Now supports mixed styles: Blueprints, Comic Art, and Architectural Schematics.
- */
 export const generateComicAsset = async (prompt: string): Promise<string | undefined> => {
   const ai = getAI();
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: {
-        parts: [{ text: `High-quality professional technical illustration, hand-drawn drafting style, thin black ink lines, slight retro print texture, architectural blueprint aesthetic: ${prompt}. Minimalist, elegant, isolated on solid white background.` }]
+        parts: [{ text: `Minimalist blueprint technical drafting, thin ink lines on white paper, professional engineering schematic: ${prompt}` }]
       },
       config: { imageConfig: { aspectRatio: "1:1" } }
     });
@@ -168,12 +175,9 @@ export const generateComicAsset = async (prompt: string): Promise<string | undef
     const imgPart = response.candidates[0].content.parts.find(p => p.inlineData);
     return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
   } catch (error) {
-    console.error("Background asset generation failed:", error);
+    console.error("Background generation failed:", error);
     return undefined;
   }
 };
 
-// Legacy support for App.tsx if needed
-export const getLatestTechNews = async (forceRefresh = false): Promise<NewsResponse> => {
-  return await getLatestNewsText(forceRefresh);
-};
+export const getLatestTechNews = getLatestNewsText;
