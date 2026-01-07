@@ -1,5 +1,6 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
+// Added import for USER_DATA to provide context to the AI agent
 import { USER_DATA } from "../constants";
 
 const getAI = () => {
@@ -10,164 +11,59 @@ const getAI = () => {
   return new GoogleGenAI({ apiKey: key });
 };
 
-const CACHE_KEY = "TECH_NEWS_CACHE";
-const CACHE_TTL = 3600000; // 1 hour
-
+// Defined GeminiResult interface for consistent response handling
 export interface GeminiResult {
   text: string;
   groundingChunks?: any[];
-  isThinking?: boolean;
-  needsHandoff?: boolean;
 }
-
-export interface NewsArticle {
-  id: string;
-  title: string;
-  summary: string;
-  url: string;
-  publishedAt: string;
-  sources?: { title: string; uri: string }[];
-}
-
-export interface NewsResponse {
-  articles: NewsArticle[];
-  lastUpdated: number;
-}
-
-interface NewsCache {
-  articles: NewsArticle[];
-  timestamp: number;
-}
-
-const SYSTEM_INSTRUCTION = `
-You are the "Web-Interface Intelligence Unit" for ${USER_DATA.name}. 
-Answer technical queries regarding Vishnunath's professional background and infrastructure experience.
-`;
-
-export const getPersonaResponse = async (userInput: string): Promise<GeminiResult> => {
-  try {
-    const ai = getAI();
-    const needsSearch = /latest|current|news|today|recent|documentation|vs|compare/i.test(userInput);
-
-    let response;
-    if (needsSearch) {
-      response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: userInput,
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-          tools: [{ googleSearch: {} }],
-          temperature: 0.2,
-        }
-      });
-    } else {
-      response = await ai.models.generateContent({
-        model: "gemini-3-pro-preview",
-        contents: userInput,
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
-          thinkingConfig: { thinkingBudget: 32768 },
-          temperature: 0.6,
-        }
-      });
-    }
-
-    const text = response.text || "";
-    const needsHandoff = text.includes(USER_DATA.aiConfig.handoffTrigger) || 
-                         text.toLowerCase().includes("reply to you personally");
-
-    return {
-      text: text.replace(USER_DATA.aiConfig.handoffTrigger, "").trim(),
-      groundingChunks: response.candidates?.[0]?.groundingMetadata?.groundingChunks,
-      isThinking: !needsSearch,
-      needsHandoff: needsHandoff
-    };
-  } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    if (error.message === "API_KEY_MISSING") {
-      return { text: "Error: API Key not found in environment. Please configure Vercel settings.", needsHandoff: true };
-    }
-    return { 
-      text: `System Alert: Latency detected in neural uplink. ${USER_DATA.aiConfig.handoffInstruction}`,
-      needsHandoff: true 
-    };
-  }
-};
 
 /**
- * Robust JSON extraction that works even if the model appends citations/grounding markers.
+ * Generates a response from the AI assistant acting as Vishnunath's professional persona.
+ * Uses gemini-3-flash-preview for efficiency and cost-effectiveness.
  */
-const extractJSON = (text: string) => {
-  try {
-    // Look for the first '[' and last ']' to isolate the array
-    const start = text.indexOf('[');
-    const end = text.lastIndexOf(']');
-    if (start !== -1 && end !== -1) {
-      const jsonStr = text.substring(start, end + 1);
-      return JSON.parse(jsonStr);
-    }
-    return JSON.parse(text);
-  } catch (e) {
-    console.error("JSON Extraction failed for text:", text);
-    throw new Error("Invalid JSON structure in AI response.");
-  }
-};
-
-export const getLatestNewsText = async (forceRefresh = false): Promise<NewsResponse> => {
-  if (!forceRefresh) {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const cacheData: NewsCache = JSON.parse(cached);
-      if (Date.now() - cacheData.timestamp < CACHE_TTL) {
-        return { articles: cacheData.articles, lastUpdated: cacheData.timestamp };
-      }
-    }
-  }
-
-  const fetchTimestamp = Date.now();
+export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> => {
   try {
     const ai = getAI();
-    // Use Flash for News Radar - it's faster and more available for search tasks
+    
+    // System instruction defining the agent's identity and boundaries
+    const systemInstruction = `You are the AI assistant for M. Vishnunath, an IT Infrastructure Specialist with 8+ years of experience.
+    
+    CONTEXT:
+    - Name: ${USER_DATA.name}
+    - Current Role: ${USER_DATA.title} at HCLTech
+    - Bio: ${USER_DATA.bio}
+    - Location: ${USER_DATA.location}
+    - Expertise: ${USER_DATA.skills.map(s => s.name).join(", ")}
+    - Experience Summary: ${USER_DATA.experience.map(e => `${e.role} at ${e.company} (${e.period})`).join("; ")}
+    
+    GUIDELINES:
+    1. Be professional, technical, and helpful.
+    2. Focus on answering queries about Vishnunath's skills in Windows Server, VMware, Hyper-V, and Infrastructure Management.
+    3. If the user asks about hiring or direct contact, provide his email (${USER_DATA.email}) or mention the WhatsApp link.
+    4. If the query is complex or outside the provided context, gracefully transition using this message: "${USER_DATA.aiConfig.handoffInstruction}"
+    5. Always maintain the persona of an expert assistant.
+    `;
+
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: "Search for and list 6 major IT infrastructure stories from the last 24 hours (Windows Server, VMware, HCLTech, or Enterprise IT). Format your entire response as a single valid JSON array of objects with keys: title, summary, url, publishedAt. Do not include markdown code blocks, just the raw JSON array.",
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
       config: {
-        tools: [{ googleSearch: {} }],
-        // We DO NOT set responseMimeType here because search grounding often adds 
-        // non-JSON citations to the text which breaks strict JSON parsing.
-      }
+        systemInstruction,
+        // Using Google Search grounding for up-to-date technical troubleshooting queries
+        tools: [{ googleSearch: {} }]
+      },
     });
 
-    const rawText = response.text || "[]";
-    const articlesData = extractJSON(rawText);
-
-    // Extract grounding URLs to display as sources
-    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    const sourceLinks = groundingChunks
-      .filter((c: any) => c.web)
-      .map((c: any) => ({ title: c.web.title, uri: c.web.uri }));
-
-    const articles: NewsArticle[] = articlesData.map((a: any, i: number) => ({
-      ...a,
-      id: `news-${fetchTimestamp}-${i}`,
-      sources: sourceLinks.slice(i, i + 2) // Associate a few sources with each card
-    }));
-
-    if (articles.length === 0) throw new Error("No articles generated.");
-
-    const cacheData: NewsCache = { articles, timestamp: fetchTimestamp };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    return { articles, lastUpdated: fetchTimestamp };
-  } catch (error: any) {
-    console.error("Tech Radar Service Failure:", error);
-    
-    // Try to fall back to stale cache if API fails
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      return { ...JSON.parse(cached), articles: JSON.parse(cached).articles };
+    return {
+      text: response.text || "I apologize, but I am unable to process that request at the moment.",
+      groundingChunks: response.candidates?.[0]?.groundingMetadata?.groundingChunks
+    };
+  } catch (error) {
+    console.error("AI Persona Response failed:", error);
+    if (error instanceof Error && error.message === "API_KEY_MISSING") {
+      return { text: "The AI agent is currently offline (API key not configured). Please contact Vishnunath directly via email or WhatsApp." };
     }
-    
-    throw error;
+    return { text: "I'm having a bit of trouble connecting to my systems. Please try again in a moment or reach out to Vishnunath." };
   }
 };
 
@@ -182,12 +78,14 @@ export const generateComicAsset = async (prompt: string): Promise<string | undef
       config: { imageConfig: { aspectRatio: "1:1" } }
     });
 
-    const imgPart = response.candidates[0].content.parts.find(p => p.inlineData);
-    return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
+    const candidates = response.candidates;
+    if (candidates && candidates.length > 0) {
+      const imgPart = candidates[0].content.parts.find(p => p.inlineData);
+      return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
+    }
+    return undefined;
   } catch (error) {
     console.error("Background generation failed:", error);
     return undefined;
   }
 };
-
-export const getLatestTechNews = getLatestNewsText;
