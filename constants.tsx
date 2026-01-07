@@ -32,9 +32,9 @@ export const USER_DATA: ExtendedPersonalData = {
   tagline: "Managing mission-critical infrastructure at scale, from legacy systems to hybrid cloud environments.",
   bio: "I am a seasoned System Administrator with over 8 years of professional experience. My journey began with 6 years at TVS Mobility (2016-2022) and currently continues at HCL (since Sep 2022), where I manage a massive environment of approximately 16,000 servers. I specialize in high-stakes incident management (P1-P3), virtualization at scale, and robust backup solutions.",
   email: "vishnunath.m95@gmail.com",
-  linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
+  linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101",
   phoneNumber: "+91 99440 12688",
-  whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20your%20AI%20agent%20suggested%20I%20contact%20you%20for%20further%20details.",
+  whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20I'm%20querying%20the%20System%20Core.",
   location: "Madurai, Tamil Nadu, India",
   hobbies: ["Tech Blogging", "Strategic Gaming", "Continuous Learning", "Infrastructure Home-Labing"],
   languages: ["English", "Tamil"],
@@ -43,69 +43,63 @@ export const USER_DATA: ExtendedPersonalData = {
     availabilityStatus: 'online',
     awayMessage: "Vishnu is currently resolving a high-priority server incident. I have logged your request; please proceed to WhatsApp to queue your query.",
     waTemplate: "Hello Vishnunath, I'm reaching out from your portfolio. I have a query that your AI agent suggested you handle personally: ",
-    handoffInstruction: "I apologize, but I have reached the threshold of my current technical knowledge regarding this specific query. I have flagged this for Vishnunath's personal review. He typically responds to professional inquiries personally within a few hours. To ensure he sees your specific question immediately, please use the 'Professional Bridge' button below to continue this conversation directly on his personal WhatsApp."
+    handoffInstruction: "I apologize, but I have reached the threshold of my current technical knowledge regarding this specific query. I have flagged this for Vishnunath's personal review. He typically responds personally within a few hours."
   },
   skills: [
     { 
       name: "Windows Server (2003-2022)", 
       category: "Backend", 
       level: 95,
-      description: "Expertise in the complete Windows Server lifecycle. From maintaining critical legacy 2003/2008 systems to deploying modern 2022 environments. Skilled in Active Directory orchestration, Group Policy management, and OS-level hardening for enterprise security compliance."
+      description: "Enterprise persistence requires managing the old while deploying the new. I maintain legacy systems (2003/2008) that run critical industrial processes while architecting modern 2022 environments with hardened security policies and global Active Directory orchestration."
     },
     { 
       name: "VMware / vCenter / ESXi", 
       category: "Tools", 
       level: 95,
-      description: "Specialized in high-density virtualization. Managing vCenter clusters at massive scale, optimizing ESXi host performance, and ensuring seamless workload migration. Deep knowledge of vMotion, High Availability (HA), and Distributed Resource Scheduler (DRS) in environments with 16k+ nodes."
+      description: "In an environment of 16,000 nodes, virtualization is the foundation. I manage massive vCenter clusters, optimizing distributed resource scheduling (DRS) and ensuring high availability (HA). This means zero-downtime migrations for mission-critical workloads."
     },
     { 
       name: "Networking & Connectivity", 
       category: "Backend", 
       level: 92,
-      description: "Enterprise networking orchestration. Managing VLAN tagging, static routing, and VPN tunnels. Skilled in troubleshooting connectivity issues across complex distributed environments and implementing OS-level firewall rules for infrastructure isolation."
+      description: "Data only matters if it can move. I orchestrate complex enterprise networks including VLAN tagging, static routing, and VPN tunneling to ensure seamless connectivity between distributed data center clusters."
     },
     { 
       name: "Hyper-V Administration", 
       category: "Tools", 
       level: 90,
-      description: "Microsoft's virtualization stack management. Proficient in Failover Clustering, Virtual Machine Manager (VMM), and architecting resilient Hyper-V environments for enterprise workloads."
+      description: "Specialized in Microsoft's virtualization stack, I manage failover clusters and Virtual Machine Manager (VMM) to provide high-resiliency hosting for core enterprise applications."
     },
     { 
       name: "ServiceNow / ITSM", 
       category: "Tools", 
       level: 95,
-      description: "Professional incident and change management. Orchestrating P1/P2/P3 incident lifecycles, maintaining rigorous SLAs, and utilizing ITSM workflows to ensure streamlined service delivery across global teams."
+      description: "Infrastructure management is about more than just servers; it's about service. I utilize ServiceNow to manage rigorous P1/P2/P3 incident lifecycles, ensuring every disruption is triaged and resolved within SLA thresholds."
     },
     { 
       name: "AI & AI Agents", 
       category: "Tools", 
       level: 85,
-      description: "Integrating Generative AI and autonomous LLM agents into infrastructure workflows. Expertise in leveraging the Gemini API for proactive system health diagnostics, automated incident summarization, and building intelligent agents for streamlined IT operations."
+      description: "The future of infrastructure is autonomous. I integrate Gemini AI to perform proactive diagnostics, automated log summarization, and predictive health checks across server nodes to catch failures before they happen."
     },
     { 
-      name: "Monitoring (Moogsoft/Spectrum)", 
+      name: "Monitoring (Spectrum)", 
       category: "Tools", 
       level: 90,
-      description: "Proactive infrastructure observability. Utilizing Moogsoft AIOps for event correlation and CA Spectrum for network/server fault isolation. Turning noise into actionable alerts to maintain 99.9% uptime."
+      description: "Visibility is safety. Using CA Spectrum, I maintain 100% observability over network and server faults, translating thousands of raw system events into actionable recovery steps."
     },
     { 
       name: "Backup (Rubrik)", 
       category: "Tools", 
       level: 85,
-      description: "Data resilience and recovery expert. Managing Rubrik's immutable backup snapshots, ensuring rapid point-in-time recovery, and orchestrating enterprise-wide data protection strategies."
+      description: "Backups are the ultimate safety net. I manage Rubrik's immutable snapshot architecture, guaranteeing that data can be recovered instantly even in the event of ransomware or catastrophic hardware failure."
     },
     { 
-      name: "Hardware Troubleshooting", 
+      name: "Hardware Diagnostics", 
       category: "Backend", 
       level: 95,
-      description: "Deep physical infrastructure diagnostics. Expertise in Dell PowerEdge, HP ProLiant, and Lenovo server hardware. Skilled in rack-level troubleshooting, vendor coordination (OEM case logging), and datacenter lifecycle management."
-    },
-    { 
-      name: "Linux Administration", 
-      category: "Backend", 
-      level: 80,
-      description: "Proficient in Linux environment management and troubleshooting as part of heterogeneous data center operations."
-    },
+      description: "Physical uptime starts with the iron. I provide deep diagnostics for Dell PowerEdge, HP ProLiant, and Lenovo server hardware, coordinating rack-level repairs and life-cycle management."
+    }
   ],
   projects: [],
   experience: [
@@ -134,17 +128,11 @@ export const USER_DATA: ExtendedPersonalData = {
       institution: "GMS.MAVMM Polytechnic College",
       year: "2013",
       percentage: "76.7%"
-    },
-    {
-      degree: "SSLC",
-      institution: "M.M Higher Secondary School",
-      year: "2010",
-      percentage: "56.7%"
     }
   ],
   certifications: [
     "IBM Certification on Cloud Computing",
-    "MCSA (Studying)"
+    "MCSA (In Progress)"
   ],
   extraCurricular: []
 };
@@ -177,12 +165,6 @@ export const ICONS = {
   HyperV: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M4 12h5"/><path d="M15 12h5"/><path d="M12 4v5"/><path d="M12 15v5"/></svg>
   ),
-  ServiceNow: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><polyline points="12 10 16 14 22 8"/></svg>
-  ),
-  Monitoring: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-  ),
   Backup: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
   ),
@@ -195,16 +177,8 @@ export const ICONS = {
   Network: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1-1v3"/><path d="M12 12V8"/></svg>
   ),
-  News: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
-  ),
-  Download: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-  ),
+  /* Added missing ExternalLink icon used in ChatWidget */
   ExternalLink: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 22 3 22 10"/><line x1="10" y1="14" x2="22" y2="2"/></svg>
-  ),
-  User: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
   )
 };
