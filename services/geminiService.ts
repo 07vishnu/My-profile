@@ -5,6 +5,7 @@ import { USER_DATA } from "../constants";
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const CACHE_KEY = "TECH_NEWS_CACHE";
+const COMIC_CACHE_KEY = "COMIC_ASSETS_CACHE";
 const CACHE_TTL = 3600000; // 1 hour
 
 export interface GeminiResult {
@@ -98,26 +99,6 @@ export const getPersonaResponse = async (userInput: string): Promise<GeminiResul
   }
 };
 
-const safePersistNews = (articles: NewsArticle[], timestamp: number) => {
-  const cacheData: NewsCache = { articles, timestamp };
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-  } catch (e: any) {
-    if (e.name === 'QuotaExceededError' || e.code === 22) {
-      const textOnlyArticles = articles.map(({ imageUrl, ...rest }) => rest);
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ articles: textOnlyArticles, timestamp }));
-      } catch (innerError) {
-        localStorage.removeItem(CACHE_KEY);
-      }
-    }
-  }
-};
-
-/**
- * Fetches the text content of latest news stories.
- * This is the fast-path for the UI.
- */
 export const getLatestNewsText = async (forceRefresh = false): Promise<NewsResponse> => {
   if (!forceRefresh) {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -159,7 +140,8 @@ export const getLatestNewsText = async (forceRefresh = false): Promise<NewsRespo
       id: `news-${fetchTimestamp}-${i}`
     }));
 
-    safePersistNews(articles, fetchTimestamp);
+    const cacheData: NewsCache = { articles, timestamp: fetchTimestamp };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
     return { articles, lastUpdated: fetchTimestamp };
   } catch (error) {
     console.error("News text fetch failed:", error);
@@ -169,29 +151,29 @@ export const getLatestNewsText = async (forceRefresh = false): Promise<NewsRespo
 };
 
 /**
- * Generates an image for a specific article.
- * This is the background-path for the UI.
+ * Generates technical background images.
+ * Now supports mixed styles: Blueprints, Comic Art, and Architectural Schematics.
  */
-export const generateArticleImage = async (article: NewsArticle): Promise<string | undefined> => {
+export const generateComicAsset = async (prompt: string): Promise<string | undefined> => {
   const ai = getAI();
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: {
-        parts: [{ text: `Minimalist 3D isometric tech icon, high quality, soft lighting: ${article.title}` }]
+        parts: [{ text: `High-quality professional technical illustration, hand-drawn drafting style, thin black ink lines, slight retro print texture, architectural blueprint aesthetic: ${prompt}. Minimalist, elegant, isolated on solid white background.` }]
       },
       config: { imageConfig: { aspectRatio: "1:1" } }
     });
 
     const imgPart = response.candidates[0].content.parts.find(p => p.inlineData);
     return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
-  } catch {
+  } catch (error) {
+    console.error("Background asset generation failed:", error);
     return undefined;
   }
 };
 
 // Legacy support for App.tsx if needed
 export const getLatestTechNews = async (forceRefresh = false): Promise<NewsResponse> => {
-  const textResult = await getLatestNewsText(forceRefresh);
-  return textResult;
+  return await getLatestNewsText(forceRefresh);
 };
