@@ -110,8 +110,14 @@
   }
 }
 </script>
+<script>
+    // Essential shim to prevent the app from crashing in browser environments
+    // where 'process' is not natively defined.
+    window.process = window.process || { env: {} };
+</script>
 </head>
 <body>
     <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
