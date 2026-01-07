@@ -65,14 +65,12 @@
             transform: translateY(-2px);
         }
 
-        /* Google Sites Header Styles */
         .header-glass {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--google-border);
         }
 
-        /* Smooth reveal transitions */
         .reveal {
             opacity: 0;
             transform: translateY(20px);
@@ -99,21 +97,22 @@
             background: #9aa0a6;
         }
     </style>
+<script>
+    // Polyfill for process.env to prevent crashes in the browser
+    window.process = window.process || { env: { NODE_ENV: 'production' } };
+</script>
 <script type="importmap">
 {
   "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "jspdf": "https://esm.sh/jspdf@^2.5.1"
+    "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.34.0",
+    "jspdf": "https://esm.sh/jspdf@2.5.1"
   }
 }
-</script>
-<script>
-    // Essential shim to prevent the app from crashing in browser environments
-    // where 'process' is not natively defined.
-    window.process = window.process || { env: {} };
 </script>
 </head>
 <body>
