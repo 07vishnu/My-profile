@@ -180,8 +180,12 @@ const App: React.FC = () => {
       const result = await getLatestNewsText(forceRefresh);
       setNews(result.articles);
     } catch (e: any) {
-      console.error(e);
-      setNewsError("Tech Radar uplink failed. Check your API configuration in Vercel settings.");
+      console.error("News Load Error:", e);
+      if (e.message === "API_KEY_MISSING") {
+        setNewsError("Tech Radar uplink failed: API Key is not configured in Vercel.");
+      } else {
+        setNewsError("Neural Link Timeout: Unable to fetch live tech data at this moment.");
+      }
     } finally {
       setIsNewsLoading(false);
     }
@@ -235,8 +239,8 @@ const App: React.FC = () => {
           <div className="container mx-auto px-6 max-w-5xl animate-in fade-in duration-500">
             <div className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
               <div>
-                <h2 className="text-3xl font-semibold text-[#202124] mb-2">Infrastructure Radar</h2>
-                <p className="text-[#5f6368] text-sm">Real-time enterprise tech intelligence via Gemini Search Grounding.</p>
+                <h2 className="text-3xl font-semibold text-[#202124] mb-2">Enterprise Tech Radar</h2>
+                <p className="text-[#5f6368] text-sm">Synchronizing with global infrastructure clusters via Gemini Search.</p>
               </div>
               <button 
                 onClick={() => loadLatestNews(true)}
@@ -246,15 +250,22 @@ const App: React.FC = () => {
                 <div className={isNewsLoading ? "animate-spin" : "group-hover:rotate-12 transition-transform"}>
                   <ICONS.Bot />
                 </div>
-                {isNewsLoading ? 'Syncing...' : 'Refresh Radar'}
+                {isNewsLoading ? 'Scanning...' : 'Refresh Cluster'}
               </button>
             </div>
             
             {isNewsLoading ? <GoogleLoader /> : newsError ? (
-              <div className="bg-[#fce8e6] border border-[#ea4335] rounded-2xl p-10 text-center flex flex-col items-center gap-4">
-                <p className="text-lg font-semibold text-[#d93025]">{newsError}</p>
-                <p className="text-sm text-[#5f6368] max-w-md">Verify your API_KEY is set in Vercel Environment Variables and that the Gemini model is accessible.</p>
-                <button onClick={() => loadLatestNews(true)} className="px-8 py-3 btn-google btn-google-primary text-sm shadow-md flex items-center gap-2">Retry Link</button>
+              <div className="bg-[#fce8e6] border border-[#ea4335] rounded-2xl p-10 text-center flex flex-col items-center gap-6 max-w-2xl mx-auto shadow-sm">
+                <div className="w-16 h-16 bg-[#ea4335] text-white rounded-full flex items-center justify-center">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                  <p className="text-xl font-semibold text-[#d93025] mb-2">{newsError}</p>
+                  <p className="text-sm text-[#5f6368] leading-relaxed">
+                    This usually happens if the <strong>API_KEY</strong> environment variable is missing or if the daily quota is reached. Check your Vercel Project Settings &gt; Environment Variables.
+                  </p>
+                </div>
+                <button onClick={() => loadLatestNews(true)} className="px-8 py-3 btn-google btn-google-primary text-sm shadow-md flex items-center gap-2">Re-establish Uplink</button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -278,7 +289,7 @@ const App: React.FC = () => {
                     )}
 
                     <a href={article.url} target="_blank" rel="noopener noreferrer" className="mt-auto text-sm font-medium text-[#1a73e8] hover:underline flex items-center gap-1">
-                      Full Coverage <ICONS.ExternalLink />
+                      Explore Coverage <ICONS.ExternalLink />
                     </a>
                   </article>
                 ))}
