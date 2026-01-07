@@ -14,6 +14,9 @@ export interface ExtendedPersonalData extends PersonalData {
   extraCurricular: string[];
   whatsappUrl: string;
   phoneNumber: string;
+  hobbies: string[];
+  languages: string[];
+  location: string;
   aiConfig: {
     handoffTrigger: string;
     availabilityStatus: 'online' | 'busy' | 'away';
@@ -32,6 +35,9 @@ export const USER_DATA: ExtendedPersonalData = {
   linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
   phoneNumber: "+91 99440 12688",
   whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20your%20AI%20agent%20suggested%20I%20contact%20you%20for%20further%20details.",
+  location: "Madurai, Tamil Nadu, India",
+  hobbies: ["Tech Blogging", "Strategic Gaming", "Continuous Learning", "Infrastructure Home-Labing"],
+  languages: ["English", "Tamil"],
   aiConfig: {
     handoffTrigger: "BRIDGE_TO_HUMAN",
     availabilityStatus: 'online',
@@ -197,5 +203,8 @@ export const ICONS = {
   ),
   ExternalLink: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 22 3 22 10"/><line x1="10" y1="14" x2="22" y2="2"/></svg>
+  ),
+  User: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
   )
 };
