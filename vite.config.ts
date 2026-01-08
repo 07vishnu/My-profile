@@ -1,6 +1,8 @@
 
 import { defineConfig } from 'vite';
 
+declare var process: { env: { [key: string]: string | undefined } };
+
 export default defineConfig({
   // Since our files are in the root, we don't need a complex root config,
   // but we must ensure process.env is handled.

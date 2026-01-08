@@ -2,6 +2,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { USER_DATA, AIConfig } from "../constants";
 
+declare var process: { env: { [key: string]: string | undefined } };
+
 const getAI = () => {
   const key = process.env.API_KEY;
   if (!key || key === "undefined") {
@@ -51,9 +53,10 @@ export const getPersonaResponse = async (prompt: string, dynamicConfig?: AIConfi
       },
     });
 
+    const candidate = response.candidates?.[0];
     return {
       text: response.text || "I apologize, but I am unable to process that request at the moment.",
-      groundingChunks: response.candidates?.[0]?.groundingMetadata?.groundingChunks
+      groundingChunks: candidate?.groundingMetadata?.groundingChunks
     };
   } catch (error: any) {
     console.error("AI Persona Response failed:", error);
@@ -69,10 +72,8 @@ export const getPersonaResponse = async (prompt: string, dynamicConfig?: AIConfi
 
 /**
  * Generates technical blueprint assets for the background.
- * Implements a check to avoid repeated calls if quota is exhausted.
  */
 export const generateComicAsset = async (prompt: string): Promise<string | undefined> => {
-  // Check if we already hit a quota limit in this session to prevent repeated errors
   if (sessionStorage.getItem('TECH_BG_DISABLED') === 'true') return undefined;
 
   try {
@@ -86,14 +87,18 @@ export const generateComicAsset = async (prompt: string): Promise<string | undef
     });
 
     const candidates = response.candidates;
-    if (candidates && candidates.length > 0 && candidates[0].content && candidates[0].content.parts) {
-      const imgPart = candidates[0].content.parts.find(p => p.inlineData);
-      return imgPart?.inlineData ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
+    if (candidates && candidates.length > 0) {
+      const firstCandidate = candidates[0];
+      if (firstCandidate.content && firstCandidate.content.parts) {
+        const imgPart = firstCandidate.content.parts.find(p => p.inlineData);
+        if (imgPart && imgPart.inlineData) {
+          return `data:image/png;base64,${imgPart.inlineData.data}`;
+        }
+      }
     }
     return undefined;
   } catch (error: any) {
     console.error("Background generation failed:", error);
-    // If we hit a quota limit, disable AI background generation for the rest of the session
     if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
       sessionStorage.setItem('TECH_BG_DISABLED', 'true');
     }
