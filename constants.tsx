@@ -2,7 +2,15 @@
 import React from 'react';
 import { PersonalData, Experience, Skill } from './types';
 
-// Extended type to include resume-specific fields and AI orchestration data
+export interface AIConfig {
+  handoffTrigger: string;
+  availabilityStatus: 'online' | 'busy' | 'away';
+  awayMessage: string;
+  waTemplate: string;
+  handoffInstruction: string;
+}
+
+// Extended type to include resume-specific fields
 export interface ExtendedPersonalData extends PersonalData {
   education: {
     degree: string;
@@ -17,13 +25,8 @@ export interface ExtendedPersonalData extends PersonalData {
   hobbies: string[];
   languages: string[];
   location: string;
-  aiConfig: {
-    handoffTrigger: string;
-    availabilityStatus: 'online' | 'busy' | 'away';
-    awayMessage: string;
-    waTemplate: string;
-    handoffInstruction: string;
-  };
+  // Default/Fallback config
+  aiConfig: AIConfig;
 }
 
 export const USER_DATA: ExtendedPersonalData = {
@@ -177,7 +180,6 @@ export const ICONS = {
   Network: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1-1v3"/><path d="M12 12V8"/></svg>
   ),
-  /* Added missing ExternalLink icon used in ChatWidget */
   ExternalLink: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
   )

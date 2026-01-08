@@ -1,6 +1,6 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { USER_DATA } from "../constants";
+import { USER_DATA, AIConfig } from "../constants";
 
 const getAI = () => {
   const key = process.env.API_KEY;
@@ -18,9 +18,10 @@ export interface GeminiResult {
 /**
  * Generates a response from the AI assistant acting as Vishnunath's professional persona.
  */
-export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> => {
+export const getPersonaResponse = async (prompt: string, dynamicConfig?: AIConfig): Promise<GeminiResult> => {
   try {
     const ai = getAI();
+    const config = dynamicConfig || USER_DATA.aiConfig;
     
     const systemInstruction = `You are the AI assistant for M. Vishnunath, an IT Infrastructure Specialist with 8+ years of experience.
     
@@ -31,12 +32,13 @@ export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> 
     - Location: ${USER_DATA.location}
     - Expertise: ${USER_DATA.skills.map(s => s.name).join(", ")}
     - Experience Summary: ${USER_DATA.experience.map(e => `${e.role} at ${e.company} (${e.period})`).join("; ")}
+    - Current Status: ${config.availabilityStatus.toUpperCase()}
     
     GUIDELINES:
     1. Be professional, technical, and helpful.
     2. Focus on answering queries about Vishnunath's skills in Windows Server, VMware, Hyper-V, and Infrastructure Management.
     3. If the user asks about hiring or direct contact, provide his email (${USER_DATA.email}) or mention the WhatsApp link.
-    4. If the query is complex or outside the provided context, gracefully transition using this message: "${USER_DATA.aiConfig.handoffInstruction}"
+    4. If the query is complex or outside the provided context, or if the current status is not 'online', use this handoff protocol: "${config.handoffInstruction}"
     5. Always maintain the persona of an expert assistant.
     `;
 

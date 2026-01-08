@@ -1,10 +1,12 @@
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { ICONS } from '../constants';
 import { Message } from '../types';
 import { getPersonaResponse, GeminiResult } from '../services/geminiService';
+import { ConfigContext } from '../App';
 
 const ChatWidget: React.FC = () => {
+  const { config } = useContext(ConfigContext);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<(Message & { chunks?: any[] })[]>([
     {
@@ -31,11 +33,9 @@ const ChatWidget: React.FC = () => {
   // Focus management: Focus input when chat opens
   useEffect(() => {
     if (isOpen) {
-      // Small timeout to ensure the animation/render is finished for some screen readers
       const timer = setTimeout(() => inputRef.current?.focus(), 100);
       return () => clearTimeout(timer);
     } else {
-      // Return focus to the trigger button when chat closes
       triggerRef.current?.focus();
     }
   }, [isOpen]);
@@ -55,7 +55,8 @@ const ChatWidget: React.FC = () => {
     setInputValue('');
     setIsLoading(true);
 
-    const result: GeminiResult = await getPersonaResponse(userMsgText);
+    // Use the dynamic config for the Gemini prompt context
+    const result: GeminiResult = await getPersonaResponse(userMsgText, config);
     
     setMessages(prev => [...prev, {
       role: 'model',
@@ -65,6 +66,18 @@ const ChatWidget: React.FC = () => {
     }]);
 
     setIsLoading(false);
+  };
+
+  const statusColors = {
+    online: 'text-[#34a853]',
+    busy: 'text-[#fbbc04]',
+    away: 'text-[#ea4335]'
+  };
+
+  const statusBg = {
+    online: 'bg-[#34a853]',
+    busy: 'bg-[#fbbc04]',
+    away: 'bg-[#ea4335]'
   };
 
   return (
@@ -89,9 +102,9 @@ const ChatWidget: React.FC = () => {
               </div>
               <div>
                 <h2 id="chat-title" className="font-semibold text-sm text-[#202124]">AI Assistant</h2>
-                <p className="text-[10px] text-[#34a853] font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#34a853]"></span> 
-                  <span className="sr-only">Status:</span> Online
+                <p className={`text-[10px] ${statusColors[config.availabilityStatus]} font-medium flex items-center gap-1`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${statusBg[config.availabilityStatus]} animate-pulse`}></span> 
+                  <span className="sr-only">Status:</span> {config.availabilityStatus.toUpperCase()}
                 </p>
               </div>
             </div>
@@ -114,6 +127,11 @@ const ChatWidget: React.FC = () => {
             aria-atomic="false"
             role="log"
           >
+            {config.availabilityStatus !== 'online' && (
+              <div className="p-4 bg-[#fff8e1] border border-[#ffe082] rounded-2xl text-[11px] text-[#795548] font-medium leading-relaxed mb-4">
+                ⚠️ System Note: {config.awayMessage}
+              </div>
+            )}
             {messages.map((m, i) => (
               <div 
                 key={i} 
@@ -206,7 +224,7 @@ const ChatWidget: React.FC = () => {
              <ICONS.Bot aria-hidden="true" />
           )}
         </div>
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#34a853] rounded-full border-2 border-white animate-pulse" aria-hidden="true"></div>
+        <div className={`absolute -top-1 -right-1 w-4 h-4 ${statusBg[config.availabilityStatus]} rounded-full border-2 border-white animate-pulse`} aria-hidden="true"></div>
       </button>
     </aside>
   );
