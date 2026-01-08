@@ -86,9 +86,9 @@ export const generateComicAsset = async (prompt: string): Promise<string | undef
     });
 
     const candidates = response.candidates;
-    if (candidates && candidates.length > 0) {
+    if (candidates && candidates.length > 0 && candidates[0].content && candidates[0].content.parts) {
       const imgPart = candidates[0].content.parts.find(p => p.inlineData);
-      return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
+      return imgPart?.inlineData ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
     }
     return undefined;
   } catch (error: any) {
