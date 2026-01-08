@@ -5,6 +5,7 @@ import { USER_DATA, ICONS } from './constants';
 import { Skill } from './types';
 
 const ComicBackground = lazy(() => import('./components/ComicBackground'));
+const ChatWidget = lazy(() => import('./components/ChatWidget'));
 
 // --- PERFORMANCE: Memoized Sub-components ---
 
@@ -393,14 +394,14 @@ const App: React.FC = () => {
           <div className="w-full max-w-md mx-auto mb-12 p-6 bg-[#202124] rounded-2xl text-left font-mono text-[10px] text-white/40 shadow-xl border border-white/5 relative overflow-hidden">
              <div className="absolute top-0 right-0 p-4 text-[#34a853] animate-pulse uppercase font-black">Online</div>
              <div className="animate-[scroll-logs_15s_linear_infinite] leading-relaxed">
-               <p>> Initializing portfolio core...</p>
-               <p>> Checking node 16402 health: OPTIMAL</p>
-               <p>> Snapshot: [IMMUTABLE] generated</p>
-               <p>> VMware Cluster status: STABLE</p>
-               <p>> ServiceNow API: CONNECTED</p>
-               <p>> Last Incident: RESOLVED</p>
-               <p>> Monitoring active: SPECTRUM</p>
-               <p>> Deploying Vishnunath v2.0...</p>
+               <p>&gt; Initializing portfolio core...</p>
+               <p>&gt; Checking node 16402 health: OPTIMAL</p>
+               <p>&gt; Snapshot: [IMMUTABLE] generated</p>
+               <p>&gt; VMware Cluster status: STABLE</p>
+               <p>&gt; ServiceNow API: CONNECTED</p>
+               <p>&gt; Last Incident: RESOLVED</p>
+               <p>&gt; Monitoring active: SPECTRUM</p>
+               <p>&gt; Deploying Vishnunath v2.0...</p>
              </div>
           </div>
           <p className="text-[11px] text-[#9aa0a6] uppercase tracking-[0.4em] font-black">© {new Date().getFullYear()} M. Vishnunath • Infrastructure Protocol v1.4</p>
@@ -433,6 +434,7 @@ const App: React.FC = () => {
         </div>
       )}
 
+      <Suspense fallback={null}><ChatWidget /></Suspense>
       <TerminalPalette isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} onCommand={handleCommand} />
       <style>{`
         @keyframes scroll-logs { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
