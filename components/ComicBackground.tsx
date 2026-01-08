@@ -1,9 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { generateComicAsset } from '../services/geminiService';
 
 const ComicBackground: React.FC = () => {
   const [assets, setAssets] = useState<string[]>([]);
+  const [isAiLoaded, setIsAiLoaded] = useState(false);
 
   useEffect(() => {
     const loadAssets = async () => {
@@ -11,25 +12,26 @@ const ComicBackground: React.FC = () => {
         const cached = sessionStorage.getItem('TECH_BG_ASSETS');
         if (cached) {
           setAssets(JSON.parse(cached));
+          setIsAiLoaded(true);
           return;
         }
-      } catch (e) {
-        console.warn("Storage access denied or corrupted:", e);
-      }
 
-      const prompts = [
-        "Architectural schematic of a global fiber-optic network backbone",
-        "Technical blueprint of an enterprise server cluster with cooling systems",
-        "Blueprint drawing of a sophisticated network switch with intricate wiring",
-        "Conceptual drafting of a cloud infrastructure cluster with data nodes"
-      ];
+        // If explicitly disabled due to quota, don't even try
+        if (sessionStorage.getItem('TECH_BG_DISABLED') === 'true') return;
 
-      try {
+        const prompts = [
+          "Cross-section of an enterprise data center rack with servers",
+          "Top-down blueprint of a complex network topology",
+          "Technical drawing of a virtual machine cluster architecture",
+          "Industrial drafting of fiber optic cabling paths"
+        ];
+
         const results = await Promise.all(prompts.map(p => generateComicAsset(p)));
         const validAssets = results.filter((r): r is string => !!r);
         
         if (validAssets.length > 0) {
           setAssets(validAssets);
+          setIsAiLoaded(true);
           try {
             sessionStorage.setItem('TECH_BG_ASSETS', JSON.stringify(validAssets));
           } catch (storageError) {
@@ -44,6 +46,15 @@ const ComicBackground: React.FC = () => {
     loadAssets();
   }, []);
 
+  // Static coordinate points for the "Blueprint" look
+  const coordinates = useMemo(() => [
+    { x: '10%', y: '15%', val: '40.7128° N, 74.0060° W' },
+    { x: '85%', y: '10%', val: 'NODE_ALPHA_094' },
+    { x: '5%', y: '90%', val: 'SYS_VER: 2.0.4' },
+    { x: '80%', y: '95%', val: 'INFRA_PROTOCOL_ACTIVE' },
+    { x: '50%', y: '5%', val: 'SECTION_A-A' }
+  ], []);
+
   const floatingAnimations = [
     "animate-[float_20s_ease-in-out_infinite]",
     "animate-[float_25s_ease-in-out_infinite_reverse]",
@@ -52,43 +63,66 @@ const ComicBackground: React.FC = () => {
   ];
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-      {/* Drafting Table Grid Overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: 'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
-        backgroundSize: '40px 40px'
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-white">
+      {/* Drafting Table Major Grid */}
+      <div className="absolute inset-0 opacity-[0.06]" style={{
+        backgroundImage: 'linear-gradient(#1a73e8 1px, transparent 1px), linear-gradient(90deg, #1a73e8 1px, transparent 1px)',
+        backgroundSize: '100px 100px'
       }}></div>
+
+      {/* Drafting Table Minor Grid */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: 'linear-gradient(#1a73e8 0.5px, transparent 0.5px), linear-gradient(90deg, #1a73e8 0.5px, transparent 0.5px)',
+        backgroundSize: '20px 20px'
+      }}></div>
+
+      {/* Blueprint Coordinate Labels */}
+      {coordinates.map((coord, i) => (
+        <div 
+          key={i} 
+          className="absolute font-mono text-[8px] font-bold text-[#1a73e8] opacity-20"
+          style={{ top: coord.y, left: coord.x }}
+        >
+          [{coord.val}]
+        </div>
+      ))}
 
       {/* Halftone Dot Overlay */}
-      <div className="absolute inset-0 opacity-[0.05]" style={{
-        backgroundImage: 'radial-gradient(currentColor 1.5px, transparent 0)',
-        backgroundSize: '32px 32px'
+      <div className="absolute inset-0 opacity-[0.04]" style={{
+        backgroundImage: 'radial-gradient(#5f6368 1px, transparent 0)',
+        backgroundSize: '24px 24px'
       }}></div>
 
-      {/* Floating Technical Concepts */}
-      <div className="absolute top-[10%] left-[8%] rotate-[-12deg] font-black text-7xl text-[#1a73e8] opacity-[0.04] blur-[1px]">
-        INFRA
+      {/* Large Floating Text - Infrastructure Themed */}
+      <div className="absolute top-[15%] left-[10%] rotate-[-15deg] font-black text-8xl text-[#1a73e8] opacity-[0.03] blur-[1px]">
+        INFRASTRUCTURE
       </div>
-      <div className="absolute top-[55%] right-[5%] rotate-[15deg] font-black text-7xl text-[#ea4335] opacity-[0.04] blur-[1px]">
-        UPTIME
-      </div>
-      <div className="absolute bottom-[15%] left-[12%] rotate-[-5deg] font-black text-7xl text-[#34a853] opacity-[0.04] blur-[1px]">
-        CORE
+      <div className="absolute bottom-[20%] right-[10%] rotate-[10deg] font-black text-8xl text-[#ea4335] opacity-[0.03] blur-[1px]">
+        AVAILABILITY
       </div>
 
-      {/* Floating Schematic Assets */}
-      {assets.map((src, i) => {
+      {/* Floating Blueprint Rulers */}
+      <div className="absolute top-0 left-0 w-full h-8 border-b border-[#dadce0] opacity-10 flex items-center px-4 overflow-hidden">
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div key={i} className={`h-full border-l border-[#dadce0] ${i % 5 === 0 ? 'w-20' : 'w-4'}`}>
+            <span className="text-[6px] ml-1">{i * 10}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Floating Schematic Assets (AI Generated) */}
+      {assets.length > 0 && assets.map((src, i) => {
         const positions = [
-          "top-[15%] left-[65%] w-[450px]",
-          "top-[60%] left-[15%] w-[400px]",
-          "top-[35%] right-[8%] w-[380px]",
-          "bottom-[5%] right-[25%] w-[420px]"
+          "top-[15%] left-[60%] w-[500px]",
+          "top-[55%] left-[10%] w-[450px]",
+          "top-[30%] right-[5%] w-[420px]",
+          "bottom-[10%] left-[40%] w-[480px]"
         ];
         
         return (
           <div 
             key={i} 
-            className={`absolute transition-opacity duration-1000 ${positions[i % positions.length]} ${floatingAnimations[i % floatingAnimations.length]} opacity-[0.08]`}
+            className={`absolute transition-opacity duration-1000 ${positions[i % positions.length]} ${floatingAnimations[i % floatingAnimations.length]} opacity-[0.07]`}
           >
             <img 
               src={src} 
@@ -99,10 +133,19 @@ const ComicBackground: React.FC = () => {
         );
       })}
 
+      {/* Fallback Static Schematics if AI Fails */}
+      {!isAiLoaded && (
+        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
+           {/* Abstract SVG blueprints can be added here if needed, but the rich CSS grid + text often suffices */}
+           <div className="absolute top-1/4 left-1/4 w-96 h-96 border-2 border-dashed border-[#1a73e8] rounded-full animate-pulse opacity-20"></div>
+           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 border-2 border-dotted border-[#ea4335] opacity-20"></div>
+        </div>
+      )}
+
       <style>{`
         @keyframes float {
           0% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-30px) rotate(2deg); }
+          50% { transform: translateY(-40px) rotate(1.5deg); }
           100% { transform: translateY(0px) rotate(0deg); }
         }
       `}</style>

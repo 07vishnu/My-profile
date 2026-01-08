@@ -1,6 +1,5 @@
 
 import { GoogleGenAI } from "@google/genai";
-// Added import for USER_DATA to provide context to the AI agent
 import { USER_DATA } from "../constants";
 
 const getAI = () => {
@@ -11,7 +10,6 @@ const getAI = () => {
   return new GoogleGenAI({ apiKey: key });
 };
 
-// Defined GeminiResult interface for consistent response handling
 export interface GeminiResult {
   text: string;
   groundingChunks?: any[];
@@ -19,13 +17,11 @@ export interface GeminiResult {
 
 /**
  * Generates a response from the AI assistant acting as Vishnunath's professional persona.
- * Uses gemini-3-flash-preview for efficiency and cost-effectiveness.
  */
 export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> => {
   try {
     const ai = getAI();
     
-    // System instruction defining the agent's identity and boundaries
     const systemInstruction = `You are the AI assistant for M. Vishnunath, an IT Infrastructure Specialist with 8+ years of experience.
     
     CONTEXT:
@@ -49,7 +45,6 @@ export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> 
       contents: prompt,
       config: {
         systemInstruction,
-        // Using Google Search grounding for up-to-date technical troubleshooting queries
         tools: [{ googleSearch: {} }]
       },
     });
@@ -58,8 +53,11 @@ export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> 
       text: response.text || "I apologize, but I am unable to process that request at the moment.",
       groundingChunks: response.candidates?.[0]?.groundingMetadata?.groundingChunks
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("AI Persona Response failed:", error);
+    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
+      return { text: "The AI system is experiencing high traffic (quota limit reached). Please contact Vishnunath directly via email while our automated systems recover." };
+    }
     if (error instanceof Error && error.message === "API_KEY_MISSING") {
       return { text: "The AI agent is currently offline (API key not configured). Please contact Vishnunath directly via email or WhatsApp." };
     }
@@ -67,13 +65,20 @@ export const getPersonaResponse = async (prompt: string): Promise<GeminiResult> 
   }
 };
 
+/**
+ * Generates technical blueprint assets for the background.
+ * Implements a check to avoid repeated calls if quota is exhausted.
+ */
 export const generateComicAsset = async (prompt: string): Promise<string | undefined> => {
+  // Check if we already hit a quota limit in this session to prevent repeated errors
+  if (sessionStorage.getItem('TECH_BG_DISABLED') === 'true') return undefined;
+
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
       contents: {
-        parts: [{ text: `Minimalist blueprint technical drafting, thin ink lines on white paper, professional engineering schematic: ${prompt}` }]
+        parts: [{ text: `Minimalist blueprint technical drafting, thin black ink lines on pure white paper, professional engineering schematic, high resolution, industrial style: ${prompt}` }]
       },
       config: { imageConfig: { aspectRatio: "1:1" } }
     });
@@ -84,8 +89,12 @@ export const generateComicAsset = async (prompt: string): Promise<string | undef
       return imgPart ? `data:image/png;base64,${imgPart.inlineData.data}` : undefined;
     }
     return undefined;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Background generation failed:", error);
+    // If we hit a quota limit, disable AI background generation for the rest of the session
+    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
+      sessionStorage.setItem('TECH_BG_DISABLED', 'true');
+    }
     return undefined;
   }
 };
