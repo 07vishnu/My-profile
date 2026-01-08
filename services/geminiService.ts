@@ -4,12 +4,28 @@ import { USER_DATA, AIConfig } from "../constants";
 
 declare var process: { env: { [key: string]: string | undefined } };
 
+/**
+ * Helper to initialize the Gemini API client.
+ * Uses process.env.API_KEY which is managed by the platform.
+ */
 const getAI = () => {
   const key = process.env.API_KEY;
   if (!key || key === "undefined") {
     throw new Error("API_KEY_MISSING");
   }
   return new GoogleGenAI({ apiKey: key });
+};
+
+/**
+ * Detects if an error is related to API quota or rate limiting.
+ */
+const isQuotaError = (error: any): boolean => {
+  const errorMessage = error?.message?.toLowerCase() || "";
+  return (
+    errorMessage.includes("429") || 
+    errorMessage.includes("resource_exhausted") || 
+    error?.status === 429
+  );
 };
 
 export interface GeminiResult {
@@ -19,6 +35,7 @@ export interface GeminiResult {
 
 /**
  * Generates a response from the AI assistant acting as Vishnunath's professional persona.
+ * Includes robust handling for quota limits and system instructions.
  */
 export const getPersonaResponse = async (prompt: string, dynamicConfig?: AIConfig): Promise<GeminiResult> => {
   try {
@@ -60,21 +77,32 @@ export const getPersonaResponse = async (prompt: string, dynamicConfig?: AIConfi
     };
   } catch (error: any) {
     console.error("AI Persona Response failed:", error);
-    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
-      return { text: "The AI system is experiencing high traffic (quota limit reached). Please contact Vishnunath directly via email while our automated systems recover." };
+    
+    if (isQuotaError(error)) {
+      // If we hit quota on chat, we stop trying to generate background images for this session to save resources.
+      sessionStorage.setItem('TECH_BG_DISABLED', 'true');
+      return { 
+        text: "The infrastructure AI is currently experiencing high demand (API quota reached). Please contact Vishnunath directly via WhatsApp or Email while our automated systems reset." 
+      };
     }
+    
     if (error instanceof Error && error.message === "API_KEY_MISSING") {
-      return { text: "The AI agent is currently offline (API key not configured). Please contact Vishnunath directly via email or WhatsApp." };
+      return { text: "The AI agent is currently offline (API configuration missing). Please contact Vishnunath directly via email or WhatsApp." };
     }
-    return { text: "I'm having a bit of trouble connecting to my systems. Please try again in a moment or reach out to Vishnunath." };
+    
+    return { text: "I'm having a bit of trouble connecting to my systems. Please try again in a moment or reach out to Vishnunath via the contact section." };
   }
 };
 
 /**
  * Generates technical blueprint assets for the background.
+ * Optimized to fail gracefully and disable future calls if quota is hit.
  */
 export const generateComicAsset = async (prompt: string): Promise<string | undefined> => {
-  if (sessionStorage.getItem('TECH_BG_DISABLED') === 'true') return undefined;
+  // Respect the session-wide disability flag
+  if (sessionStorage.getItem('TECH_BG_DISABLED') === 'true') {
+    return undefined;
+  }
 
   try {
     const ai = getAI();
@@ -98,10 +126,15 @@ export const generateComicAsset = async (prompt: string): Promise<string | undef
     }
     return undefined;
   } catch (error: any) {
-    console.error("Background generation failed:", error);
-    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
+    console.error("Technical asset generation failed:", error);
+    
+    if (isQuotaError(error)) {
+      // Set the session flag to prevent further unnecessary API calls.
       sessionStorage.setItem('TECH_BG_DISABLED', 'true');
+      // Returning undefined ensures the UI gracefully falls back to CSS-only backgrounds.
+      return undefined;
     }
+    
     return undefined;
   }
 };

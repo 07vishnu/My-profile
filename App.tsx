@@ -57,7 +57,7 @@ const MonitorDashboard = memo(({ status }: { status: AIConfig['availabilityStatu
         <div className="flex items-center gap-2 md:gap-4">
           <div className="hidden sm:flex gap-1">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className={`w-1 h-3 rounded-full ${i < 4 ? 'bg-google-green' : 'bg-google-border'} animate-pulse`} style={{ animationDelay: `${i * 0.2}s` }}></div>
+              <div key={i} className={`w-1 h-3 rounded-full ${i < 4 ? 'bg-google-green' : 'bg-google-border dark:bg-google-border'} animate-pulse`} style={{ animationDelay: `${i * 0.2}s` }}></div>
             ))}
           </div>
           <span className="text-[8px] md:text-[10px] font-bold text-google-blue uppercase tracking-widest font-mono">NODE_STABLE</span>
@@ -112,8 +112,8 @@ const BrandLogo = memo(({ className = "" }: { className?: string }) => (
       </g>
 
       <g className="translate-y-4">
-        <rect x="106" y="280" width="300" height="75" fill="white" rx="16" className="dark:fill-noc-surface shadow-lg" />
-        <text x="256" y="332" textAnchor="middle" className="font-black text-[44px] tracking-tighter transition-all group-hover:tracking-normal group-hover:fill-google-blue" fill="#202124">VISHNUNATH</text>
+        <rect x="106" y="280" width="300" height="75" fill="var(--google-bg)" rx="16" className="shadow-lg" />
+        <text x="256" y="332" textAnchor="middle" className="font-black text-[44px] tracking-tighter transition-all group-hover:tracking-normal group-hover:fill-google-blue" fill="var(--text-main)">VISHNUNATH</text>
         <rect x="106" y="280" width="4" height="75" fill="#1a73e8" filter="url(#neon-glow)" className="animate-[scan-move_2s_cubic-bezier(0.4,0,0.2,1)_infinite]" />
         <rect x="106" y="280" width="300" height="75" fill="url(#scan-grad)" fillOpacity="0.1" className="pointer-events-none" />
       </g>

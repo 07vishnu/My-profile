@@ -13,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -37,12 +38,21 @@
             --google-bg: #fdfdfd;
             --google-surface: #f8f9fa;
             --google-border: #dadce0;
+            --text-main: #202124;
+        }
+
+        html.dark {
+            --google-bg: #121212;
+            --google-surface: #1e1e1e;
+            --google-border: #3c4043;
+            --google-gray: #9aa0a6;
+            --text-main: #e8eaed;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--google-bg);
-            color: #202124;
+            color: var(--text-main);
             letter-spacing: -0.01em;
             -webkit-font-smoothing: antialiased;
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -63,27 +73,30 @@
 
         .btn-google-primary:hover {
             background-color: #1557b0;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302), 0 1px 3px 1px rgba(60,64,67,0.149);
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
         }
 
         .google-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(4px);
+            background: var(--google-surface);
             border: 1px solid var(--google-border);
             border-radius: 12px;
             transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
         }
 
         .google-card:hover {
-            box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
-            background: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,.3), 0 4px 8px 3px rgba(0,0,0,.15);
             transform: translateY(-2px);
         }
 
         .header-glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
+            background: rgba(var(--glass-bg, 253, 253, 253), 0.8);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--google-border);
+        }
+        
+        html.dark .header-glass {
+            --glass-bg: 18, 18, 18;
+            background: rgba(18, 18, 18, 0.8);
         }
 
         .reveal {
@@ -106,7 +119,10 @@
         ::-webkit-scrollbar-thumb {
             background: #bdc1c6;
             border-radius: 10px;
-            border: 3px solid white;
+            border: 3px solid var(--google-bg);
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #5f6368;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #9aa0a6;

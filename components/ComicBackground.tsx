@@ -63,15 +63,15 @@ const ComicBackground: React.FC = () => {
   ];
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-white">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-google-bg transition-colors duration-500">
       {/* Drafting Table Major Grid */}
-      <div className="absolute inset-0 opacity-[0.06]" style={{
+      <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04]" style={{
         backgroundImage: 'linear-gradient(#1a73e8 1px, transparent 1px), linear-gradient(90deg, #1a73e8 1px, transparent 1px)',
         backgroundSize: '100px 100px'
       }}></div>
 
       {/* Drafting Table Minor Grid */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]" style={{
         backgroundImage: 'linear-gradient(#1a73e8 0.5px, transparent 0.5px), linear-gradient(90deg, #1a73e8 0.5px, transparent 0.5px)',
         backgroundSize: '20px 20px'
       }}></div>
@@ -80,7 +80,7 @@ const ComicBackground: React.FC = () => {
       {coordinates.map((coord, i) => (
         <div 
           key={i} 
-          className="absolute font-mono text-[8px] font-bold text-[#1a73e8] opacity-20"
+          className="absolute font-mono text-[8px] font-bold text-[#1a73e8] opacity-20 dark:opacity-30"
           style={{ top: coord.y, left: coord.x }}
         >
           [{coord.val}]
@@ -88,24 +88,24 @@ const ComicBackground: React.FC = () => {
       ))}
 
       {/* Halftone Dot Overlay */}
-      <div className="absolute inset-0 opacity-[0.04]" style={{
+      <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.02]" style={{
         backgroundImage: 'radial-gradient(#5f6368 1px, transparent 0)',
         backgroundSize: '24px 24px'
       }}></div>
 
       {/* Large Floating Text - Infrastructure Themed */}
-      <div className="absolute top-[15%] left-[10%] rotate-[-15deg] font-black text-8xl text-[#1a73e8] opacity-[0.03] blur-[1px]">
+      <div className="absolute top-[15%] left-[10%] rotate-[-15deg] font-black text-8xl text-[#1a73e8] opacity-[0.03] dark:opacity-[0.02] blur-[1px]">
         INFRASTRUCTURE
       </div>
-      <div className="absolute bottom-[20%] right-[10%] rotate-[10deg] font-black text-8xl text-[#ea4335] opacity-[0.03] blur-[1px]">
+      <div className="absolute bottom-[20%] right-[10%] rotate-[10deg] font-black text-8xl text-[#ea4335] opacity-[0.03] dark:opacity-[0.02] blur-[1px]">
         AVAILABILITY
       </div>
 
       {/* Floating Blueprint Rulers */}
-      <div className="absolute top-0 left-0 w-full h-8 border-b border-[#dadce0] opacity-10 flex items-center px-4 overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-8 border-b border-google-border opacity-20 flex items-center px-4 overflow-hidden">
         {Array.from({ length: 50 }).map((_, i) => (
-          <div key={i} className={`h-full border-l border-[#dadce0] ${i % 5 === 0 ? 'w-20' : 'w-4'}`}>
-            <span className="text-[6px] ml-1">{i * 10}</span>
+          <div key={i} className={`h-full border-l border-google-border ${i % 5 === 0 ? 'w-20' : 'w-4'}`}>
+            <span className="text-[6px] ml-1 opacity-40">{i * 10}</span>
           </div>
         ))}
       </div>
@@ -122,12 +122,12 @@ const ComicBackground: React.FC = () => {
         return (
           <div 
             key={i} 
-            className={`absolute transition-opacity duration-1000 ${positions[i % positions.length]} ${floatingAnimations[i % floatingAnimations.length]} opacity-[0.07]`}
+            className={`absolute transition-opacity duration-1000 ${positions[i % positions.length]} ${floatingAnimations[i % floatingAnimations.length]} opacity-[0.07] dark:opacity-[0.04]`}
           >
             <img 
               src={src} 
               alt="Background Schematic" 
-              className="w-full h-auto mix-blend-multiply drop-shadow-sm filter grayscale contrast-125"
+              className="w-full h-auto mix-blend-multiply dark:mix-blend-screen drop-shadow-sm filter grayscale contrast-125 invert dark:invert-0"
             />
           </div>
         );
@@ -136,7 +136,6 @@ const ComicBackground: React.FC = () => {
       {/* Fallback Static Schematics if AI Fails */}
       {!isAiLoaded && (
         <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
-           {/* Abstract SVG blueprints can be added here if needed, but the rich CSS grid + text often suffices */}
            <div className="absolute top-1/4 left-1/4 w-96 h-96 border-2 border-dashed border-[#1a73e8] rounded-full animate-pulse opacity-20"></div>
            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 border-2 border-dotted border-[#ea4335] opacity-20"></div>
         </div>
