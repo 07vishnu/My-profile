@@ -1,3 +1,4 @@
+
 export interface Project {
   id: string;
   title: string;
@@ -34,6 +35,7 @@ export interface PersonalData {
   bio: string;
   email: string;
   linkedinUrl?: string;
+  instagramUrl?: string;
   skills: Skill[];
   projects: Project[];
   experience: Experience[];

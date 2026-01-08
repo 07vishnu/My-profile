@@ -36,6 +36,7 @@ export const USER_DATA: ExtendedPersonalData = {
   bio: "I am a seasoned System Administrator with over 8 years of professional experience. My journey began with 6 years at TVS Mobility (2016-2022) and currently continues at HCL (since Sep 2022), where I manage a massive environment of approximately 16,000 servers. I specialize in high-stakes incident management (P1-P3), virtualization at scale, and robust backup solutions.",
   email: "vishnunath.m95@gmail.com",
   linkedinUrl: "https://www.linkedin.com/in/vishnunath-m-2b77a9101",
+  instagramUrl: "https://www.instagram.com/vishnu_love7?igsh=cjBqZjc3bHA2YjJq",
   phoneNumber: "+91 99440 12688",
   whatsappUrl: "https://wa.me/919944012688?text=Hello%20Vishnunath,%20I'm%20querying%20the%20System%20Core.",
   location: "Madurai, Tamil Nadu, India",
@@ -147,6 +148,9 @@ export const ICONS = {
   Linkedin: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
   ),
+  Instagram: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+  ),
   WhatsApp: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3l-1.5 4.5Z"/><path d="M9.4 8.9c.4.2.8.5 1.1.9l.4.5c.3.4.4.8.2 1.2-.2.3-.6.6-1 1l-.2.2c-.3.3-.6.7-.4 1.2.2.4.6.9 1.1 1.4.5.5 1 .9 1.4 1.1.5.2.9-.1 1.2-.4l.2-.2c.4-.4.7-.8 1-.6.4.2.8.3 1.2.2.4-.2.7-.4.9-.8.2-.4.1-.9-.2-1.2l-.5-.4c-.4-.3-.7-.6-.9-1.1"/></svg>
   ),
@@ -182,5 +186,13 @@ export const ICONS = {
   ),
   ExternalLink: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  ),
+  // Sun icon for dark mode toggle
+  Sun: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  ),
+  // NocMode icon for dark mode toggle (Moon)
+  NocMode: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
   )
 };
