@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 const app = express();
 const PORT = 3000;
@@ -169,90 +169,6 @@ app.post("/api/comic-asset", async (req, res) => {
     }
     console.error("Server API /api/comic-asset error:", error);
     res.status(500).json({ error: "Video asset generated error" });
-  }
-});
-
-// API: Grounded Real-Time Technology News Aggregator
-app.get("/api/tech-news", async (req, res) => {
-  const FALLBACK_NEWS = [
-    {
-      title: "Windows Server 2025 Accelerates Hybrid Cloud Security & Hotpatching",
-      source: "Microsoft Tech Community",
-      date: "Recently",
-      summary: "Microsoft debuts Windows Server 2025, detailing major improvements in next-gen storage performance, seamless Azure Arc-enabled hybrid integration, and high-availability hotpatching capability for secure cluster deployments without heavy system reboots.",
-      url: "https://techcommunity.microsoft.com/"
-    },
-    {
-      title: "VMware vSphere 8.0 Update 3 Enhances GPU Sharing & Cluster DRS",
-      source: "Broadcom VMware Blog",
-      date: "Recently",
-      summary: "Broadcom's latest release of VMware vSphere 8.0 Update 3 optimizes high-performance computing clusters with customized GPU sharing, improved CPU resource scheduler controls, and smarter VM live-migration parameters.",
-      url: "https://blogs.vmware.com/"
-    },
-    {
-      title: "Rubrik and Microsoft Forge Alliance on Zero Trust Ransomware Protection",
-      source: "Cloud Security Journal",
-      date: "Recently",
-      summary: "Rubrik extends its multi-tier security integrations with safe, air-gapped immutable backup orchestrations for large Enterprise Active Directory and Wintel clusters subject to aggressive ransomware attacks.",
-      url: "https://www.rubrik.com/"
-    },
-    {
-      title: "Gemini 3.5 Flash Showcases Landmark Speed and 1M-Token Context Window",
-      source: "Google DeepMind",
-      date: "Recently",
-      summary: "Google's newest Gemini models completely redefine rapid agentic software operations, equipping administrative tools and cloud service systems with vast context lookup spans and low-latency API call integration.",
-      url: "https://deepmind.google/"
-    },
-    {
-      title: "ServiceNow Washington DC Release Automates ITIL Problem Workflows",
-      source: "ServiceNow Blog",
-      date: "Recently",
-      summary: "ServiceNow launches version Washington DC, introducing generative AI intelligence to analyze and prioritize critical P1 cluster incidents, suppressing repetitive alerts by up to 90% across infrastructure operations.",
-      url: "https://www.servicenow.com/"
-    }
-  ];
-
-  try {
-    const ai = getAI();
-    const query = "What are the top 5 absolute latest breaking enterprise technology, datacenter virtualisation, Microsoft Windows Server, or cloud backup security announcements of this month? Summarize each clearly in professional corporate tone.";
-    
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: query,
-      config: {
-        systemInstruction: "You are a professional Enterprise Tech News Anchor. Find the latest news in datacenter virtualization, Windows Server, VMware, Rubrik, Microsoft, HCL, and cloud technology. Format the response strictly as a JSON array of stories. Do not return markdown except the JSON itself. Make sure the URLs are valid standard corporate links.",
-        tools: [{ googleSearch: {} }],
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              title: { type: Type.STRING },
-              source: { type: Type.STRING },
-              date: { type: Type.STRING },
-              summary: { type: Type.STRING },
-              url: { type: Type.STRING }
-            },
-            required: ["title", "source", "date", "summary"]
-          }
-        }
-      }
-    });
-
-    const text = response.text?.trim() || "";
-    if (text) {
-      // Safely parse JSON from model
-      const parsed = JSON.parse(text);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return res.json({ news: parsed, source: "Google Search Grounding Live" });
-      }
-    }
-    res.json({ news: FALLBACK_NEWS, source: "System Cache (Offline)" });
-
-  } catch (error: any) {
-    console.warn("Could not retrieve live news with grounding, using secure fallback: ", error.message || error);
-    res.json({ news: FALLBACK_NEWS, source: "System Cache (Offline Fallback)" });
   }
 });
 

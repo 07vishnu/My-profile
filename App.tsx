@@ -5,7 +5,6 @@ import { USER_DATA, ICONS, AIConfig } from './constants';
 import { Skill } from './types';
 import { fetchDynamicAIConfig } from './services/configService';
 import { NOCCenter } from './components/NOCCenter';
-import { TechNews } from './components/TechNews';
 
 const ComicBackground = lazy(() => import('./components/ComicBackground'));
 const ChatWidget = lazy(() => import('./components/ChatWidget'));
@@ -182,12 +181,12 @@ const TerminalPalette = memo(({ isOpen, onClose, onCommand }: { isOpen: boolean;
       setStdout(prev => [
         ...prev,
         "Available terminal commands:",
-        "  /about, /noc, /news, /expertise, /experience, /contact  --> Scroll to dossier segments",
-        "  /ping                                                    --> Diagnose server sector latencies",
-        "  /nodes                                                   --> Query virtual resource clusters status",
-        "  /uptime                                                  --> Fetch high-availability duration",
-        "  /resume                                                  --> Compile official resume dossier document",
-        "  /exit, /clear                                            --> Exit or purge logs buffer"
+        "  /about, /noc, /expertise, /experience, /contact  --> Scroll to dossier segments",
+        "  /ping                                            --> Diagnose server sector latencies",
+        "  /nodes                                           --> Query virtual resource clusters status",
+        "  /uptime                                          --> Fetch high-availability duration",
+        "  /resume                                          --> Compile official resume dossier document",
+        "  /exit, /clear                                    --> Exit or purge logs buffer"
       ]);
       setInput('');
       return;
@@ -230,7 +229,7 @@ const TerminalPalette = memo(({ isOpen, onClose, onCommand }: { isOpen: boolean;
     }
 
     // If it's a section navigation command
-    if (['about', 'noc', 'noc-center', 'tech-news', 'news', 'technews', 'expertise', 'experience', 'contact', 'resume'].includes(cmd)) {
+    if (['about', 'noc', 'noc-center', 'expertise', 'experience', 'contact', 'resume'].includes(cmd)) {
       onCommand(raw);
       setStdout(prev => [
         ...prev,
@@ -349,11 +348,8 @@ const App: React.FC = () => {
 
   const handleCommand = (cmd: string) => {
     const c = cmd.toLowerCase().replace('/', '');
-    let mapped = c === 'noc' ? 'noc-center' : c;
-    if (['news', 'technews', 'tech-news'].includes(mapped)) {
-      mapped = 'tech-news';
-    }
-    if (['about', 'noc-center', 'tech-news', 'expertise', 'experience', 'contact'].includes(mapped)) {
+    const mapped = c === 'noc' ? 'noc-center' : c;
+    if (['about', 'noc-center', 'expertise', 'experience', 'contact'].includes(mapped)) {
       document.getElementById(mapped)?.scrollIntoView({ behavior: 'smooth' });
     } else if (c === 'resume') {
       generateResumePDF();
@@ -642,7 +638,7 @@ const App: React.FC = () => {
       const visible = entries.find(e => e.isIntersecting);
       if (visible) setActiveSection(visible.target.id);
     }, { threshold: 0.3 });
-    ['home', 'about', 'noc-center', 'tech-news', 'expertise', 'experience', 'contact'].forEach(id => {
+    ['home', 'about', 'noc-center', 'expertise', 'experience', 'contact'].forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -677,13 +673,13 @@ const App: React.FC = () => {
             </button>
             <div className="flex items-center gap-2 md:gap-3">
               <div className="hidden lg:flex items-center gap-1">
-                {['about', 'noc-center', 'tech-news', 'expertise', 'experience'].map((id) => (
+                {['about', 'noc-center', 'expertise', 'experience'].map((id) => (
                   <button 
                     key={id} 
                     onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })} 
                     className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${activeSection === id ? 'text-google-blue bg-google-blue/10' : 'text-google-gray hover:bg-google-surface'}`}
                   >
-                    {id === 'noc-center' ? 'NOC CORES' : id === 'tech-news' ? 'TECH NEWS' : id.toUpperCase()}
+                    {id === 'noc-center' ? 'NOC CORES' : id.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -726,12 +722,6 @@ const App: React.FC = () => {
                   <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
                 </svg>
                 DOWNLOAD RESUME
-              </button>
-              <button onClick={() => document.getElementById('tech-news')?.scrollIntoView({ behavior: 'smooth' })} className="px-6 md:px-10 py-3 md:py-4 btn-google bg-[#f4b400] hover:bg-[#db9d00] text-white text-xs md:text-sm font-bold shadow-xl hover:scale-105 transition-all tracking-widest flex items-center justify-center gap-2">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zm-1-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-                </svg>
-                TECH NEWS
               </button>
               <button onClick={() => setIsTerminalOpen(true)} className="px-6 md:px-10 py-3 md:py-4 btn-google border-2 border-google-border text-google-blue dark:text-google-blue bg-google-bg text-xs md:text-sm font-bold hover:border-google-blue hover:scale-105 transition-transform tracking-widest uppercase">Shell</button>
             </div>
@@ -792,10 +782,6 @@ const App: React.FC = () => {
 
           <section id="noc-center" className="bg-google-bg/20 border-b border-google-border">
             <NOCCenter />
-          </section>
-
-          <section id="tech-news" className="bg-google-bg/10 border-b border-google-border">
-            <TechNews />
           </section>
 
           <section id="expertise" className="py-16 md:py-32 px-4 md:px-6">
