@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import { USER_DATA, ICONS, AIConfig } from './constants';
 import { Skill } from './types';
 import { fetchDynamicAIConfig } from './services/configService';
+import { NOCCenter } from './components/NOCCenter';
 
 const ComicBackground = lazy(() => import('./components/ComicBackground'));
 const ChatWidget = lazy(() => import('./components/ChatWidget'));
@@ -135,46 +136,164 @@ const BrandLogo = memo(({ className = "" }: { className?: string }) => (
 
 const TerminalPalette = memo(({ isOpen, onClose, onCommand }: { isOpen: boolean; onClose: () => void; onCommand: (cmd: string) => void }) => {
   const [input, setInput] = useState('');
+  const [stdout, setStdout] = useState<string[]>([
+    "Systems Core Security Shell [v2.4.8-active]",
+    "Type '/help' to inspect infrastructure command controls.",
+    "Ready for telemetry query coordination..."
+  ]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const terminalEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen) inputRef.current?.focus();
+    if (isOpen) {
+      inputRef.current?.focus();
+      // Auto-scroll on mount if open
+      terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [isOpen]);
+
+  useEffect(() => {
+    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [stdout]);
 
   if (!isOpen) return null;
 
+  const runCommandLocal = (fullCmd: string) => {
+    const raw = fullCmd.trim();
+    if (!raw) return;
+
+    setStdout(prev => [...prev, `vishnu@core:~$ ${raw}`]);
+    const cmd = raw.toLowerCase().replace('/', '');
+
+    if (cmd === 'clear') {
+      setStdout([]);
+      setInput('');
+      return;
+    }
+
+    if (cmd === 'exit' || cmd === 'quit') {
+      onClose();
+      setInput('');
+      return;
+    }
+
+    if (cmd === 'help' || cmd === 'h' || cmd === '?') {
+      setStdout(prev => [
+        ...prev,
+        "Available terminal commands:",
+        "  /about, /noc, /expertise, /experience, /contact  --> Scroll to dossier segments",
+        "  /ping                                            --> Diagnose server sector latencies",
+        "  /nodes                                           --> Query virtual resource clusters status",
+        "  /uptime                                          --> Fetch high-availability duration",
+        "  /resume                                          --> Compile official resume dossier document",
+        "  /exit, /clear                                    --> Exit or purge logs buffer"
+      ]);
+      setInput('');
+      return;
+    }
+
+    if (cmd === 'ping') {
+      setStdout(prev => [
+        ...prev,
+        "Ping virtual DB cluster nodes segment [10.142.128.0/24]...",
+        "  64 bytes from 10.142.128.14: icmp_seq=1 ttl=128 time=1.8ms",
+        "  64 bytes from 10.142.128.23: icmp_seq=2 ttl=128 time=2.1ms",
+        "--- DB segment ping statistics ---",
+        "  2 packets transmitted, 2 received, 0% packet loss, latency=1.95ms"
+      ]);
+      setInput('');
+      return;
+    }
+
+    if (cmd === 'nodes') {
+      setStdout(prev => [
+        ...prev,
+        "Total Environment size: 16,402 hosts active",
+        "Hypervisor Layers: VMware ESXi vSphere / Microsoft Hyper-V",
+        "Immutable backup snapshot storage pool: OK (Rubrik Orchestrated)",
+        "ServiceNow ITIL Ticket Pipeline: OPERATIONAL [0 Critical P1 Pending]"
+      ]);
+      setInput('');
+      return;
+    }
+
+    if (cmd === 'uptime') {
+      setStdout(prev => [
+        ...prev,
+        "Systems Active Uptime: 432 days, 14 hours, 23 minutes, 11 seconds",
+        "Global High Availability Guarantee: 99.998% compliant",
+        "NOC Core Core service status: OPERATIONAL / OPTIMAL"
+      ]);
+      setInput('');
+      return;
+    }
+
+    // If it's a section navigation command
+    if (['about', 'noc', 'noc-center', 'expertise', 'experience', 'contact', 'resume'].includes(cmd)) {
+      onCommand(raw);
+      setStdout(prev => [
+        ...prev,
+        `Redirecting viewport focus to section [${cmd.toUpperCase()}] successfully.`
+      ]);
+      setInput('');
+      if (cmd !== 'resume') {
+        // Close on successful section navigation to let the visitor see the scroll
+        setTimeout(onClose, 300);
+      }
+      return;
+    }
+
+    // Default error response
+    setStdout(prev => [
+      ...prev,
+      `Command: '${raw}' not recognized. Type '/help' for options.`
+    ]);
+    setInput('');
+  };
+
   return (
-    <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-24 md:pt-32 px-4 md:px-6" onClick={onClose}>
-      <div className="w-full max-w-2xl bg-[#202124] rounded-2xl shadow-3xl border border-white/10 overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-        <div className="p-4 border-b border-white/5 flex items-center justify-between">
+    <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-start justify-center pt-20 md:pt-32 px-4 md:px-6" onClick={onClose}>
+      <div className="w-full max-w-2xl bg-[#18181b] rounded-2xl shadow-3xl border border-white/10 overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        
+        {/* Terminal Header */}
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#121214]">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-google-red"></div>
             <div className="w-2.5 h-2.5 rounded-full bg-google-yellow"></div>
             <div className="w-2.5 h-2.5 rounded-full bg-google-green"></div>
-            <span className="ml-2 text-[8px] md:text-[10px] font-mono text-white/40 uppercase tracking-widest">System Core Shell</span>
+            <span className="ml-2 text-[8px] md:text-[10px] font-mono text-white/40 uppercase tracking-widest">NOC Core Shell Systems</span>
           </div>
           <span className="text-[8px] md:text-[10px] font-mono text-white/20">ESC to exit</span>
         </div>
-        <div className="p-4 md:p-6">
+
+        {/* Stdout Log Area */}
+        <div className="p-4 md:p-6 h-[260px] overflow-y-auto font-mono text-[10px] md:text-xs text-[#4af626] space-y-2 select-text selection:bg-[#4af626]/20 bg-[#0c0c0e]">
+          {stdout.map((line, i) => (
+            <p key={i} className="leading-relaxed whitespace-pre-wrap">{line}</p>
+          ))}
+          <div ref={terminalEndRef}></div>
+        </div>
+
+        {/* Dynamic Command Input bar */}
+        <div className="p-4 bg-[#121214] border-t border-white/10">
           <div className="flex items-center gap-2 md:gap-3">
-            <span className="text-google-green font-mono text-sm md:text-base">vishnu@core:~$</span>
+            <span className="text-[#4af626] font-mono text-xs md:text-sm">vishnu@core:~$</span>
             <input 
               ref={inputRef}
-              className="flex-1 bg-transparent border-none outline-none text-white font-mono text-base md:text-lg placeholder:text-white/20"
-              placeholder="Query expertise..."
+              className="flex-1 bg-transparent border-none outline-none text-white font-mono text-xs md:text-sm placeholder:text-white/20"
+              placeholder="Enter instruction (/help for suggestions...)"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => {
                 if (e.key === 'Enter') {
-                  onCommand(input);
-                  setInput('');
-                  onClose();
+                  runCommandLocal(input);
                 }
                 if (e.key === 'Escape') onClose();
               }}
             />
           </div>
         </div>
+
       </div>
     </div>
   );
@@ -188,6 +307,7 @@ const App: React.FC = () => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [dynamicConfig, setDynamicConfig] = useState<AIConfig>(USER_DATA.aiConfig);
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'VIRTUALIZATION' | 'CORE INFRASTRUCTURE' | 'MONITORING & CLOUD'>('ALL');
 
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
@@ -228,40 +348,289 @@ const App: React.FC = () => {
 
   const handleCommand = (cmd: string) => {
     const c = cmd.toLowerCase().replace('/', '');
-    if (['about', 'expertise', 'experience', 'contact'].includes(c)) {
-      document.getElementById(c)?.scrollIntoView({ behavior: 'smooth' });
+    const mapped = c === 'noc' ? 'noc-center' : c;
+    if (['about', 'noc-center', 'expertise', 'experience', 'contact'].includes(mapped)) {
+      document.getElementById(mapped)?.scrollIntoView({ behavior: 'smooth' });
     } else if (c === 'resume') {
       generateResumePDF();
     }
   };
 
   const generateResumePDF = useCallback(() => {
-    const doc = new jsPDF();
-    doc.setFillColor(26, 115, 232);
-    doc.rect(0, 0, 210, 40, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.text(USER_DATA.name, 20, 20);
-    doc.setFontSize(10);
-    doc.text(USER_DATA.title.toUpperCase(), 20, 28);
-    doc.setTextColor(32, 33, 36);
-    let y = 60;
-    doc.text(`Email: ${USER_DATA.email}`, 20, y);
-    doc.text(`Phone: ${USER_DATA.phoneNumber}`, 20, y + 5);
-    y += 20;
-    doc.setFontSize(14);
-    doc.text("Professional Experience", 20, y);
-    y += 10;
-    USER_DATA.experience.forEach(exp => {
+    // Initialize standard A4 PDF (Portrait, Millimeters, A4)
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Core parameters for layout
+    const margin = 20;
+    const pageWidth = 210;
+    const printableWidth = pageWidth - (margin * 2); // 170mm
+    let y = 15;
+
+    // Helper to draw clean section header with an elegant bottom rule
+    const drawSectionHeader = (title: string) => {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
-      doc.text(exp.role, 20, y);
-      doc.setFontSize(9);
-      doc.text(`${exp.company} | ${exp.period}`, 20, y + 5);
-      const lines = doc.splitTextToSize(exp.description, 170);
-      doc.text(lines, 20, y + 10);
-      y += (lines.length * 5) + 15;
+      doc.setTextColor(26, 115, 232); // Google Blue
+      doc.text(title.toUpperCase(), margin, y);
+      
+      doc.setDrawColor(218, 220, 224); // light gray border
+      doc.setLineWidth(0.4);
+      doc.line(margin, y + 2, margin + printableWidth, y + 2);
+      y += 8;
+    };
+
+    // Helper for beautiful standard multiline body text
+    const drawParagraph = (text: string, fontSize = 9, spacing = 4.5) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(fontSize);
+      doc.setTextColor(32, 33, 36); // Charcoal Black
+      const lines = doc.splitTextToSize(text, printableWidth);
+      
+      if (y + (lines.length * spacing) > 275) {
+        doc.addPage();
+        y = 20;
+      }
+      
+      lines.forEach((line: string) => {
+        doc.text(line, margin, y);
+        y += spacing;
+      });
+    };
+
+    // Helper to render customized indented bullet points
+    const drawBullet = (text: string, indent = 6, fontSize = 8.5, spacing = 4) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(fontSize);
+      doc.setTextColor(32, 33, 36);
+      
+      const bulletChar = "•";
+      const wrapWidth = printableWidth - indent;
+      const lines = doc.splitTextToSize(text, wrapWidth);
+      
+      if (y + (lines.length * spacing) > 275) {
+        doc.addPage();
+        y = 20;
+      }
+
+      // Render bullet icon slightly offset
+      doc.text(bulletChar, margin + 1.5, y);
+
+      // Render lines nicely wrapped
+      lines.forEach((line: string) => {
+        doc.text(line, margin + indent, y);
+        y += spacing;
+      });
+    };
+
+    // --- PAGE 1 HEADER BAR ---
+    doc.setFillColor(26, 115, 232); // Deep Google Blue Accent Accent
+    doc.rect(margin, y, printableWidth, 3.5, 'F');
+    y += 11;
+
+    // Name & Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(23);
+    doc.setTextColor(32, 33, 36);
+    doc.text("VISHNUNATH M", margin, y);
+    y += 6.5;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(26, 115, 232);
+    doc.text("Wintel and VMware Administrator / IT Infrastructure Specialist", margin, y);
+    y += 7.5;
+
+    // Contact Grid with balanced gray labels
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(95, 99, 104); // google gray
+    doc.text("Location: Madurai, Tamil Nadu, India", margin, y);
+    doc.text("Email: vishnunath.m95@gmail.com", margin + 65, y);
+    doc.text("Phone: +91 9944012688", margin + 124, y);
+    y += 4.5;
+    
+    doc.text("LinkedIn: linkedin.com/in/vishnunath-m", margin, y);
+    doc.text("Portfolio: https://knowaboutvishnu.vercel.app/", margin + 65, y);
+    y += 10;
+
+    // --- PROFESSIONAL SUMMARY ---
+    drawSectionHeader("Professional Summary");
+    const summaryText = "Wintel and VMware Administrator with 8+ years of experience in Windows Server administration, VMware vSphere, and enterprise infrastructure support. Expertise in incident management (ITIL), SLA management, root cause analysis, and system monitoring. Proven ability to maintain high availability systems and resolve complex issues in large-scale environments.";
+    drawParagraph(summaryText, 9.5, 4.8);
+    y += 5.5;
+
+    // --- TECHNICAL SKILLS ---
+    drawSectionHeader("Technical Skills");
+    const skills = [
+      "VMware vSphere, ESXi, vCenter, vMotion, DRS, HA clustering technologies",
+      "Windows Server Administration (Legacy 2003 through Modern 2022 configurations)",
+      "Active Directory Administration, Group Policy (GPO) curation, and role-based access management",
+      "Incident Management (ITIL alignment), rigorous SLA enforcement, and OLA governance",
+      "System Monitoring: SolarWinds (iObserve), Moogsoft alert pipelines, CA Spectrum",
+      "Enterprise Scale Virtualization: VMware vSphere, Microsoft Hyper-V, Nutanix hyperconverged stacks",
+      "Durable Backup & Recovery: Rubrik immutable architecture orchestration",
+      "PowerShell scripting, repetitive CLI automation, and performance health checking",
+      "Server resource fine-tuning, load diagnostics, and root cause analysis (RCA)",
+      "SNMP, WMI, and syslog protocols tracking system metrics and trap signals",
+      "Enterprise Patch Management, OS build upgrades, compliance reporting, and audits",
+      "DNS, DHCP, subnet planning, IP address management (IPAM), and local routing paths"
+    ];
+    skills.forEach(skill => {
+      drawBullet(skill, 6, 8.5, 4.2);
     });
-    doc.save(`Resume_Vishnunath.pdf`);
+    y += 5.5;
+
+    // --- KEY TECHNOLOGIES ---
+    drawSectionHeader("Key Technologies & Vertical Capabilities");
+    const keyTechs = [
+      "Core OS Support: Windows Server Administration, Server Maintenance, Patch Compliance",
+      "Virtualization & Hypervisors: VMware vCenter, VMware ESXi hosts, vMotion hot-migrations, DRS clustering, high-availability setups",
+      "Domain Orchestration: Active Directory Administration, User access auditing, Group Policy objects",
+      "Incident Response: Incident Management (ITIL protocols), strict SLA Compliance, Root Cause Analysis (RCA)",
+      "Telemetry & Monitoring: CA Spectrum, SolarWinds, SNMP traps, WMI diagnostics",
+      "Security & Continuity: Rubrik backups, system disaster recovery, physical hardware lifecycle diagnostics"
+    ];
+    keyTechs.forEach(tech => {
+      drawBullet(tech, 6, 8.5, 4.2);
+    });
+    y += 6.5;
+
+    // --- PROFESSIONAL EXPERIENCE ---
+    drawSectionHeader("Professional Experience");
+
+    // Company 1: HCLTech
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text("VMware Administrator", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(95, 99, 104);
+    doc.text("HCLTech – Tenet Healthcare Project", margin + 45, y);
+    doc.text("Sep 2022 – Present", margin + 120, y);
+    y += 5;
+
+    const exp1Bullets = [
+      "Managing 16,000+ servers in diverse VMware and Hyper-V host environments, overseeing cluster balance and hardware resource consumption limits.",
+      "Delivering Windows Server Administration alongside day-to-day VMware vCenter host clusters configurations, troubleshooting kernel resource leaks.",
+      "Triage and resolve complex P1/P2/P3 user environment incidents with ServiceNow, securing 100% SLA commitment response targets.",
+      "Reduced system outage and node crash ticket resolution cycle duration by approximately 25% through proactive root cause playbook standardizations.",
+      "Conducted multiple safe hot live migration tasks (vMotion) and diagnostic checks across active enterprise database host servers with zero user downtime.",
+      "Orchestrated monitoring alert parameters with Moogsoft and Spectrum to detect real physical fan failures, drive faults, and hypervisor resource exhaustions.",
+      "Prepared thorough Root Cause Analysis (RCA) portfolios for major core service disruptions, suggesting permanent firmware and driver patches to vendor endpoints.",
+      "Supervised enterprise recovery operations and secure air-gapped snapshots using modern, immutable Rubrik backup pools."
+    ];
+    exp1Bullets.forEach(bullet => {
+      drawBullet(bullet, 6, 8.5, 4.2);
+    });
+    y += 3.5;
+
+    // Force elegant page break before the second experience so it stays together perfectly
+    doc.addPage();
+    y = 20;
+
+    // Decorative blue accent top-header on page 2 to maintain editorial symmetry
+    doc.setFillColor(26, 115, 232);
+    doc.rect(margin, y, printableWidth, 1.5, 'F');
+    y += 8;
+
+    // Company 2: TVS Mobility
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text("System Administrator", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(95, 99, 104);
+    doc.text("TVS Mobility", margin + 42, y);
+    doc.text("Sep 2016 – Sep 2022", margin + 120, y);
+    y += 5;
+
+    const exp2Bullets = [
+      "Administered multi-site Windows Server structures and active directory forests, provisioning user identities, local directory constraints, and security groups.",
+      "Managed Group Policies and role-based folder and registry permissions to prevent security credential hazards and unprivileged access.",
+      "Configured and maintained local branch network configurations including switches, routers, firewalls, LAN routing, and core structural connections.",
+      "Spearheaded scheduled WSUS patch management pipelines and server health diagnostic monitoring sweeps across 200+ local machines, decreasing vulnerabilities.",
+      "Addressed critical physical branch server hardware alerts, executing RAID card transplants, disk swap workflows, and resolving remote Office 365 issues."
+    ];
+    exp2Bullets.forEach(bullet => {
+      drawBullet(bullet, 6, 8.5, 4.2);
+    });
+    y += 5.5;
+
+    // --- ACHIEVEMENTS ---
+    drawSectionHeader("Key Professional Achievements");
+    const achievements = [
+      "Maintained 100% SLA compliance for critical P1/P2/P3 user incidents within the healthcare support project.",
+      "Reduced overall cluster incident resolution lifecycle durations by ~25% through localized script automation.",
+      "Supported massive worldwide environment hosting over 16,000 servers under demanding project performance parameters.",
+      "Restored monitoring platform trust by rebuilding SNMP queries and suppressing high volumes of redundant alert triggers."
+    ];
+    achievements.forEach(ach => {
+      drawBullet(ach, 6, 8.5, 4.2);
+    });
+    y += 5.5;
+
+    // --- SELECTED PROJECTS ---
+    drawSectionHeader("Highlighted Projects");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text("VMware VM Migration & Incident Resolution", margin, y);
+    y += 4;
+    drawParagraph("Safely migrated active database workloads and server instances in real-time across data center segments. Resolved deep physical-to-virtual connectivity conflicts during off-peak windows, ensuring absolute uptime with zero business disruptions.", 8.5, 4.0);
+    y += 4.5;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text("Telemetry Alert Storm Suppression & Tuning", margin, y);
+    y += 4;
+    drawParagraph("Conducted statistical analyses of recurring false triggers across Spectrum and SolarWinds configurations. Rewrote localized polling parameters to discard transient spikes, enhancing network team response focus by 40%.", 8.5, 4.0);
+    y += 5.5;
+
+    // --- EDUCATION ---
+    drawSectionHeader("Education & Qualifications");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text("Bachelor of Engineering (B.E.) in Computer Science & Engineering", margin, y);
+    y += 4;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(95, 99, 104);
+    doc.text("Kamaraj College of Engineering and Technology, Anna University | 2016", margin, y);
+    y += 5;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text("Diploma in Computer Science & Engineering", margin, y);
+    y += 4;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(95, 99, 104);
+    doc.text("GMS.MAVMM Polytechnic College | 2013", margin, y);
+    y += 6.5;
+
+    // --- CERTIFICATIONS ---
+    drawSectionHeader("Certifications & Continued Learning");
+    const certs = [
+      "IBM Certified – Cloud Computing Foundations",
+      "Professional Training: VMware Workloads, Cloud Deployments & Virtual Server Infrastructure Support (Percipio)"
+    ];
+    certs.forEach(cert => {
+      drawBullet(cert, 6, 8.5, 4.2);
+    });
+
+    // Save of compiled portfolio PDF
+    doc.save("VISHNUNATH_M_Resume.pdf");
   }, []);
 
   useEffect(() => {
@@ -269,7 +638,7 @@ const App: React.FC = () => {
       const visible = entries.find(e => e.isIntersecting);
       if (visible) setActiveSection(visible.target.id);
     }, { threshold: 0.3 });
-    ['home', 'about', 'expertise', 'experience', 'contact'].forEach(id => {
+    ['home', 'about', 'noc-center', 'expertise', 'experience', 'contact'].forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -304,13 +673,13 @@ const App: React.FC = () => {
             </button>
             <div className="flex items-center gap-2 md:gap-3">
               <div className="hidden lg:flex items-center gap-1">
-                {['about', 'expertise', 'experience'].map((id) => (
+                {['about', 'noc-center', 'expertise', 'experience'].map((id) => (
                   <button 
                     key={id} 
                     onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })} 
                     className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${activeSection === id ? 'text-google-blue bg-google-blue/10' : 'text-google-gray hover:bg-google-surface'}`}
                   >
-                    {id.toUpperCase()}
+                    {id === 'noc-center' ? 'NOC CORES' : id.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -330,6 +699,7 @@ const App: React.FC = () => {
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
               </button>
+              <button onClick={generateResumePDF} className="px-3 md:px-5 py-1.5 md:py-2 border border-google-green text-google-green dark:text-google-green hover:bg-google-green/10 transition-colors text-[8px] md:text-[10px] font-bold tracking-widest rounded-full uppercase mr-1">RESUME</button>
               <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="px-3 md:px-5 py-1.5 md:py-2 btn-google btn-google-primary text-[8px] md:text-[10px] font-black tracking-widest shadow-md">HIRE ME</button>
             </div>
           </div>
@@ -347,7 +717,13 @@ const App: React.FC = () => {
             
             <div className="flex flex-wrap justify-center gap-3 md:gap-4">
               <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="px-6 md:px-10 py-3 md:py-4 btn-google btn-google-primary text-xs md:text-sm font-bold shadow-xl hover:scale-105 transition-transform tracking-widest">VIEW DOSSIER</button>
-              <button onClick={() => setIsTerminalOpen(true)} className="px-6 md:px-10 py-3 md:py-4 btn-google border-2 border-google-border text-google-blue bg-google-bg text-xs md:text-sm font-bold hover:border-google-blue hover:scale-105 transition-transform tracking-widest uppercase">Shell</button>
+              <button onClick={generateResumePDF} className="px-6 md:px-10 py-3 md:py-4 btn-google bg-[#34a853] hover:bg-[#2d8d46] text-white text-xs md:text-sm font-bold shadow-xl hover:scale-105 transition-all tracking-widest flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                </svg>
+                DOWNLOAD RESUME
+              </button>
+              <button onClick={() => setIsTerminalOpen(true)} className="px-6 md:px-10 py-3 md:py-4 btn-google border-2 border-google-border text-google-blue dark:text-google-blue bg-google-bg text-xs md:text-sm font-bold hover:border-google-blue hover:scale-105 transition-transform tracking-widest uppercase">Shell</button>
             </div>
           </section>
 
@@ -394,21 +770,59 @@ const App: React.FC = () => {
                         </li>
                       ))}
                     </ul>
-                    <button onClick={generateResumePDF} className="w-full mt-8 md:mt-10 py-3 md:py-4 bg-google-surface border border-google-border rounded-xl font-bold text-[10px] md:text-xs text-google-gray hover:bg-google-blue hover:text-white hover:border-google-blue transition-all uppercase tracking-[0.2em]">Generate PDF Dossier</button>
+                    <button onClick={generateResumePDF} className="w-full mt-8 md:mt-10 py-3 md:py-4 bg-google-surface border border-google-border rounded-xl font-bold text-[10px] md:text-xs text-google-gray hover:bg-google-blue hover:text-white hover:border-google-blue transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                      Download Official Resume (PDF)
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
+          <section id="noc-center" className="bg-google-bg/20 border-b border-google-border">
+            <NOCCenter />
+          </section>
+
           <section id="expertise" className="py-16 md:py-32 px-4 md:px-6">
             <div className="container mx-auto max-w-6xl">
-              <div className="text-center mb-12 md:mb-20">
+              <div className="text-center mb-10 md:mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">Technical Spectrum</h2>
                 <p className="text-sm md:text-base text-google-gray max-w-2xl mx-auto font-medium">Deep-layer expertise in legacy and next-gen infrastructure management.</p>
               </div>
+
+              {/* Dynamic Skill Filters pills */}
+              <div className="flex flex-wrap justify-center gap-2 mb-10 md:mb-16">
+                {(['ALL', 'VIRTUALIZATION', 'CORE INFRASTRUCTURE', 'MONITORING & CLOUD'] as const).map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 md:px-6 py-2 rounded-full text-xs font-bold transition-all border ${
+                      selectedCategory === cat 
+                        ? 'bg-google-blue text-white border-google-blue shadow-lg scale-105' 
+                        : 'bg-google-surface text-google-gray border-google-border hover:border-google-blue/50 hover:text-inherit'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {USER_DATA.skills.map((skill) => (
+                {USER_DATA.skills.filter(skill => {
+                  if (selectedCategory === 'ALL') return true;
+                  const name = skill.name.toLowerCase();
+                  if (selectedCategory === 'VIRTUALIZATION') {
+                    return name.includes('vmware') || name.includes('hyper-v');
+                  }
+                  if (selectedCategory === 'CORE INFRASTRUCTURE') {
+                    return name.includes('windows') || name.includes('networking') || name.includes('hardware');
+                  }
+                  if (selectedCategory === 'MONITORING & CLOUD') {
+                    return name.includes('monitoring') || name.includes('servicenow') || name.includes('backup') || name.includes('ai');
+                  }
+                  return true;
+                }).map((skill) => (
                   <button 
                     key={skill.name} 
                     onClick={() => setSelectedSkill(skill)}
